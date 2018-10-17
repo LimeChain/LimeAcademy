@@ -1,5 +1,8 @@
 pragma solidity ^0.4.23;
+
 import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
+
+
 contract Billboard is Ownable {
 
     uint256 public price = 1 ether;
