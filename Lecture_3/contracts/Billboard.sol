@@ -50,7 +50,7 @@ contract Billboard is Ownable {
         return historyOfOwners.length;
     }
 
-    function withdraw() public {
+    function withdraw() public onlyOwner {
         uint256 balance = address(this).balance;
 
         require(balance > 0, "Contract balance is 0");
