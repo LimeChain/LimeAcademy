@@ -53,13 +53,13 @@ describe('Billboard', () => {
         });
     
         it('should throw updating price with invalid value', async () => {
-            assert.revert(contract.setPrice(0));
+            await assert.revert(contract.setPrice(0));
         });
     
         it('should throw if non-authorized user tries to update price', async () => {
             let _notOwnerWallet = new ethers.Wallet(notOwner.secretKey, provider);
             let _contract = new ethers.Contract(contract.address, Billboard.abi, _notOwnerWallet);
-            assert.revert(_contract.setPrice(ONE_ETHER));
+            await assert.revert(_contract.setPrice(ONE_ETHER));
         });
 
     });
@@ -104,7 +104,7 @@ describe('Billboard', () => {
         });
     
         it('should throw if transferred ethers are not enough', async () => {
-            assert.revert(contract.buy(slogan, {value: 1000}));
+            await assert.revert(contract.buy(slogan, {value: 1000}));
         });
 
     });
@@ -146,13 +146,13 @@ describe('Billboard', () => {
         });
     
         it('should throw trying to withraw when balance is empty', async () => {
-            assert.revert(contract.withdraw());
+            await assert.revert(contract.withdraw());
         });
     
         it('should throw when non-authorized user tries to withdraw', async () => {
             let _notOwnerWallet = new ethers.Wallet(notOwner.secretKey, provider);
             let _contract = new ethers.Contract(contract.address, Billboard.abi, _notOwnerWallet);
-            assert.revert(_contract.withdraw()); 
+            await assert.revert(_contract.withdraw());
         });
 
     });
