@@ -59,4 +59,35 @@
       </div>
     </div>
   </div>
+  <br>
+  <hr>
+  <br>
+  <div class="row">
+    <div class="col no-gutters">
+      <div class="card">
+        <div class=" card-body ">
+          <h5 class="card-title ">Buy billboard</h5>
+          <div>
+            <input type="text" [(ngModel)]="newSlogan" placeholder="Your slogan">
+            <input type="password" [(ngModel)]="password" placeholder="Your password">
+            <button class="btn btn-info" (click)="buyBillboard()">Buy</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <br>
+  <div class="row">
+    <div class="col no-gutters">
+      <div class="card">
+        <div class=" card-body ">
+          <h5 class="card-title ">Create Wallet</h5>
+          <div>
+            <input type="password" [(ngModel)]="encryptPassword" placeholder="Your password">
+            <button class="btn btn-info" (click)="createWallet()">Create Wallet</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>

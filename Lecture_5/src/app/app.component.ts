@@ -1,4 +1,5 @@
 declare let require: any;
+declare var web3: any;
 import { Component } from '@angular/core';
 import * as ethers from 'ethers';
 const Billboard = require('./contract_interfaces/Billboard.json');
@@ -20,6 +21,10 @@ export class AppComponent {
   public infuraProvider: ethers.providers.InfuraProvider;
   public contractAddress = '0x78ed7A34D67fB3eAc745e7af78aE1bcA770C26de';
   public deployedContract: ethers.Contract;
+
+  public password: string;
+  public encryptPassword: string;
+
 
   constructor() {
     this.infuraProvider = new ethers.providers.InfuraProvider('rinkeby', this.infuraApiKey);
@@ -51,4 +56,13 @@ export class AppComponent {
     const moneySpent = await this.deployedContract.moneySpent(this.address);
     console.log(moneySpent.toNumber());
   }
+
+  public async buyBillboard() {
+
+  }
+
+  public async createWallet() {
+
+  }
+
 }
