@@ -91,4 +91,14 @@
       </div>
     </div>
   </div>
+  <form action="/">
+    <fieldset>
+      <legend>Upload photo</legend>
+      <!--string _name, uint _price, uint _quantity, string _pictureHash-->
+      <input type="file" name="photo" id="photo">
+      <button type="button" style="margin-left: 20px" onclick="upload()">Upload</button>
+      Picture HASH:
+      <input id="pictureHash" type="text" disabled="true">
+    </fieldset>
+  </form>
 </div>
