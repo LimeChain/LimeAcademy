@@ -69,6 +69,8 @@
           <h5 class="card-title ">Buy billboard</h5>
           <div>
             <input type="text" [(ngModel)]="newSlogan" placeholder="Your slogan">
+            <input type="file" name="photo" id="photo">
+            <button class="btn btn-info" type="button" style="margin-left: 20px" (click)="upload()">Upload</button>
             <input type="text" [(ngModel)]="password" placeholder="Your password">
             <button class="btn btn-info" (click)="buyBillboard()">Buy</button>
           </div>
