@@ -2,6 +2,8 @@ declare let require: any;
 declare var web3: any;
 import { Component } from '@angular/core';
 import * as ethers from 'ethers';
+import * as ipfs from 'ipfs';
+
 const Billboard = require('./contract_interfaces/Billboard.json');
 
 @Component({
@@ -19,7 +21,7 @@ export class AppComponent {
   public gasPrice: string;
   public infuraApiKey = 'abca6d1110b443b08ef271545f24b80d';
   public infuraProvider: ethers.providers.InfuraProvider;
-  public contractAddress = '0x78ed7A34D67fB3eAc745e7af78aE1bcA770C26de';
+  public contractAddress = '0xEE5A49D15090e910E8f4Cc6721f2E371997B1893';
   public deployedContract: ethers.Contract;
 
   public password: string;
@@ -66,55 +68,15 @@ export class AppComponent {
 
   public async buyBillboard() {
 
-    // Initialize wallet with privateKey
-    // const wallet = new ethers.Wallet(this.privateKey, this.infuraProvider);
-    // const connectedContract = this.deployedContract.connect(wallet);
-    // const sentTransaction = await connectedContract.buy(this.newSlogan, { value: 10 });
-    // const transactionComplete = await this.infuraProvider.waitForTransaction(sentTransaction.hash);
-    // console.log(transactionComplete);
-    // alert('we are done');
-
-    // Initialize wallet with mnemonic
-    // const initialWallet = ethers.Wallet.fromMnemonic(this.mnemonic);
-    // const wallet = initialWallet.connect(this.infuraProvider);
-    // const connectedContract = this.deployedContract.connect(wallet);
-    // const sentTransaction = await connectedContract.buy(this.newSlogan, { value: 51 });
-    // const transactionComplete = await this.infuraProvider.waitForTransaction(sentTransaction.hash);
-    // console.log(transactionComplete);
-    // alert('we are done');
-
-    // Initialize wallet with encrypted Json
-    // const initialWallet = await ethers.Wallet.fromEncryptedJson(this.json, this.password, callback);
-    // const wallet = initialWallet.connect(this.infuraProvider);
-    // const connectedContract = this.deployedContract.connect(wallet);
-    // const sentTransaction = await connectedContract.buy(this.newSlogan, { value: 51 });
-    // const transactionComplete = await this.infuraProvider.waitForTransaction(sentTransaction.hash);
-    // console.log(transactionComplete);
-    // alert('we are done');
-    // function callback(progress) {
-    //   console.log('Decrypt: ' + progress * 100 + ' % completed');
-    // }
-
     // Take the encrypted Json from local storage, decrypt it and use it to sign transactions
     const json = window.localStorage.getItem('wallet');
-    const initialWallet = await ethers.Wallet.fromEncryptedJson(json, this.password, callback);
+    const initialWallet = await ethers.Wallet.fromEncryptedJson(json, this.password);
     const wallet = initialWallet.connect(this.infuraProvider);
     const connectedContract = this.deployedContract.connect(wallet);
     const sentTransaction = await connectedContract.buy(this.newSlogan, { value: 51 });
     const transactionComplete = await this.infuraProvider.waitForTransaction(sentTransaction.hash);
     console.log(transactionComplete);
     alert('we are done');
-    function callback(progress) {
-      console.log('Decrypt: ' + progress * 100 + ' % completed');
-    }
-
-
-    // Use web3Provider to initialize signer and use it to sign transactions with MetaMask
-    // const web3Provider = new ethers.providers.Web3Provider(web3.currentProvider);
-    // const signer = web3Provider.getSigner();
-    // const connectedContract = await this.deployedContract.connect(signer);
-    // const sentTransaction = await connectedContract.buy(this.newSlogan, { value: 50 });
-
 
   }
 

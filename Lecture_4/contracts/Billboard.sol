@@ -5,7 +5,7 @@ import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 
 contract Billboard is Ownable {
 
-    uint256 public price = 1 ether;
+    uint256 public price = 50 wei;
     address public billboardOwner;
     address[] public historyOfOwners;
     mapping(address => uint256) public moneySpent;
