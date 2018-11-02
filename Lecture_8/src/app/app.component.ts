@@ -3,7 +3,6 @@ declare var web3: any;
 import { Component } from '@angular/core';
 import * as ethers from 'ethers';
 import * as IPFS from 'ipfs-api';
-import { read } from 'fs';
 const ipfs = new IPFS('localhost', 5001)
 declare const Buffer;
 
@@ -17,6 +16,7 @@ const Billboard = require('./contract_interfaces/Billboard.json');
 export class AppComponent {
 
 	public billboardContent: string = null;
+	public sloganHash: string;
 	public address: string;
 	public newSlogan: string;
 	public privateKey: string;
@@ -24,7 +24,7 @@ export class AppComponent {
 	public gasPrice: string;
 	public infuraApiKey = 'abca6d1110b443b08ef271545f24b80d';
 	public infuraProvider: ethers.providers.InfuraProvider;
-	public contractAddress = '0xEE5A49D15090e910E8f4Cc6721f2E371997B1893';
+	public contractAddress = '0x4f9F104209BB124Ce846F156939075953eC5f34D';
 	public deployedContract: ethers.Contract;
 
 	public password: string;
@@ -58,6 +58,8 @@ export class AppComponent {
 
 	public async getBillboardContent() {
 		this.billboardContent = await this.deployedContract.slogan();
+		this.sloganHash = await this.deployedContract.ipfsHash();
+		console.log(this.sloganHash);
 	}
 
 	public async getTransactionHash(transactionHash) {
@@ -77,7 +79,8 @@ export class AppComponent {
 		const initialWallet = await ethers.Wallet.fromEncryptedJson(json, this.password);
 		const wallet = initialWallet.connect(this.infuraProvider);
 		const connectedContract = this.deployedContract.connect(wallet);
-		const sentTransaction = await connectedContract.buy(this.newSlogan, { value: 51 });
+		console.log(this.ipfsHash);
+		const sentTransaction = await connectedContract.buy(this.newSlogan, this.ipfsHash, { value: 51 });
 		const transactionComplete = await this.infuraProvider.waitForTransaction(sentTransaction.hash);
 		console.log(transactionComplete);
 		alert('we are done');
@@ -117,16 +120,14 @@ export class AppComponent {
 		const reader = new FileReader();
 		const self = this;
 		reader.onloadend = function () {
-			const buf = Buffer(reader.result) // Convert data into buffer
-			// ipfs.files.add(buf, (err, result) => { // Upload buffer to IPFS
-			// 	if (err) {
-			// 		console.error(err);
-			// 		return;
-			// 	}
-			// 	let url = `http://localhost:8080/ipfs/${result[0].hash}`;
-			// 	console.log(`Url --> ${url}`)
-			// 	self.ipfsHash = result[0].hash;
-			// })
+			const buf = Buffer(reader.result); // Convert data into buffer
+			ipfs.files.add(buf, (error, result) => {
+				if (error) {
+					console.log("something went wrong");
+				}
+				console.log(result[0].hash);
+				self.ipfsHash = result[0].hash;
+			})
 		}
 		const photo = document.getElementById("photo");
 		reader.readAsArrayBuffer(photo['files'][0]); // Read Provided File
