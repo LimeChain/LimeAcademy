@@ -1,7 +1,7 @@
-pragma solidity ^0.4.23;
+pragma solidity ^0.4.25;
 
 import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
-
+import "openzeppelin-solidity/contracts/token/ERC20/ERC20.sol";
 
 contract Billboard is Ownable {
 
@@ -10,6 +10,11 @@ contract Billboard is Ownable {
     address[] public historyOfOwners;
     mapping(address => uint256) public moneySpent;
     string public slogan;
+    address public billToken;
+
+    constructor(address _billTokenContract) public {
+        billToken = _billTokenContract;
+    }
 
     /**
      * events
@@ -31,15 +36,18 @@ contract Billboard is Ownable {
      * functions
      */
 
-    function buy(string newSlogan) public payable {
-        require(msg.value >= price, "The ether sent was too low");
+    function buy(string newSlogan, uint256 tokens) public {
+        require(tokens > price, "The tokens sent was too low");
 
         billboardOwner = msg.sender;
         historyOfOwners.push(msg.sender);
-        moneySpent[msg.sender] += msg.value;
+        moneySpent[msg.sender] += tokens;
         slogan = newSlogan;
+        price = tokens;
 
-        emit LogBillboardBought(msg.sender, msg.value, newSlogan);
+        require(ERC20(billToken).transferFrom(msg.sender, address(this), tokens));
+
+        emit LogBillboardBought(msg.sender, tokens, newSlogan);
     }
 
     function setPrice(uint256 newPrice) public onlyOwner onlyPositive(newPrice) {
@@ -51,11 +59,9 @@ contract Billboard is Ownable {
     }
 
     function withdraw() public onlyOwner {
-        uint256 balance = address(this).balance;
-
-        require(balance > 0, "Contract balance is 0");
-
-        owner.transfer(address(this).balance);
+        ERC20 billContract = ERC20(billToken);
+        uint256 balance = billContract.balanceOf(address(this));
+        billContract.transfer(owner, balance);
 
         emit LogWithdrawal(balance, now);
     }
