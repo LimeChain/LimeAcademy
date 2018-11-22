@@ -1,0 +1,1714 @@
+{
+  "contractName": "LimeFactory",
+  "abi": [
+    {
+      "constant": true,
+      "inputs": [
+        {
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "name": "limes",
+      "outputs": [
+        {
+          "name": "name",
+          "type": "string"
+        },
+        {
+          "name": "carbohydrates",
+          "type": "uint8"
+        },
+        {
+          "name": "fat",
+          "type": "uint8"
+        },
+        {
+          "name": "protein",
+          "type": "uint8"
+        }
+      ],
+      "payable": false,
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "name": "_slogan",
+          "type": "bytes32"
+        },
+        {
+          "name": "_otherSlogan",
+          "type": "bytes32"
+        }
+      ],
+      "payable": false,
+      "stateMutability": "nonpayable",
+      "type": "constructor"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": false,
+          "name": "name",
+          "type": "string"
+        }
+      ],
+      "name": "FreshLime",
+      "type": "event"
+    }
+  ],
+  "bytecode": "0x608060405234801561001057600080fd5b506040516040806102a1833981018060405281019080805190602001909291908051906020019092919050505081600081600019169055508060018160001916905550505061023d806100646000396000f300608060405260043610610041576000357c0100000000000000000000000000000000000000000000000000000000900463ffffffff16806321310ecd14610046575b600080fd5b34801561005257600080fd5b5061007160048036038101908080359060200190929190505050610113565b60405180806020018560ff1660ff1681526020018460ff1660ff1681526020018360ff1660ff168152602001828103825286818151815260200191508051906020019080838360005b838110156100d55780820151818401526020810190506100ba565b50505050905090810190601f1680156101025780820380516001836020036101000a031916815260200191505b509550505050505060405180910390f35b60028181548110151561012257fe5b9060005260206000209060020201600091509050806000018054600181600116156101000203166002900480601f0160208091040260200160405190810160405280929190818152602001828054600181600116156101000203166002900480156101ce5780601f106101a3576101008083540402835291602001916101ce565b820191906000526020600020905b8154815290600101906020018083116101b157829003601f168201915b5050505050908060010160009054906101000a900460ff16908060010160019054906101000a900460ff16908060010160029054906101000a900460ff169050845600a165627a7a7230582058ab86dc28b626c6f4ea129e12ac198be7376af43e6d5bdf2cde51703288eacb0029",
+  "deployedBytecode": "0x608060405260043610610041576000357c0100000000000000000000000000000000000000000000000000000000900463ffffffff16806321310ecd14610046575b600080fd5b34801561005257600080fd5b5061007160048036038101908080359060200190929190505050610113565b60405180806020018560ff1660ff1681526020018460ff1660ff1681526020018360ff1660ff168152602001828103825286818151815260200191508051906020019080838360005b838110156100d55780820151818401526020810190506100ba565b50505050905090810190601f1680156101025780820380516001836020036101000a031916815260200191505b509550505050505060405180910390f35b60028181548110151561012257fe5b9060005260206000209060020201600091509050806000018054600181600116156101000203166002900480601f0160208091040260200160405190810160405280929190818152602001828054600181600116156101000203166002900480156101ce5780601f106101a3576101008083540402835291602001916101ce565b820191906000526020600020905b8154815290600101906020018083116101b157829003601f168201915b5050505050908060010160009054906101000a900460ff16908060010160019054906101000a900460ff16908060010160029054906101000a900460ff169050845600a165627a7a7230582058ab86dc28b626c6f4ea129e12ac198be7376af43e6d5bdf2cde51703288eacb0029",
+  "sourceMap": "26:583:2:-;;;278:127;8:9:-1;5:2;;;30:1;27;20:12;5:2;278:127:2;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;355:7;346:6;:16;;;;;;;386:12;372:11;:26;;;;;;;278:127;;26:583;;;;;;",
+  "deployedSourceMap": "26:583:2:-;;;;;;;;;;;;;;;;;;;;;;;;252:19;;8:9:-1;5:2;;;30:1;27;20:12;5:2;252:19:2;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;23:1:-1;8:100;33:3;30:1;27:10;8:100;;;99:1;94:3;90:11;84:18;80:1;75:3;71:11;64:39;52:2;49:1;45:10;40:15;;8:100;;;12:14;252:19:2;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;:::o",
+  "source": "pragma solidity ^0.4.24;\n\ncontract LimeFactory {\n\n    bytes32 slogan;\n    bytes32 otherSlogan;\n\n    event FreshLime(string name);\n\n    struct Lime {\n        string name;\n        uint8 carbohydrates;\n        uint8 fat;\n        uint8 protein;\n    }\n\n    Lime[] public limes;\n\n    constructor(bytes32 _slogan, bytes32 _otherSlogan) public {\n        slogan = _slogan;\n        otherSlogan = _otherSlogan;\n    }\n\n    function createLime(string _name, uint8 _carbohydrates, uint8 _fat, uint8 _protein) internal {\n        limes.push(Lime(_name, _carbohydrates, _fat, _protein));\n        emit FreshLime(_name);\n    }\n}",
+  "sourcePath": "/Users/martingrigorov/Documents/Lectures/Contracts/contracts/LimeFactory.sol",
+  "ast": {
+    "absolutePath": "/Users/martingrigorov/Documents/Lectures/Contracts/contracts/LimeFactory.sol",
+    "exportedSymbols": {
+      "LimeFactory": [
+        352
+      ]
+    },
+    "id": 353,
+    "nodeType": "SourceUnit",
+    "nodes": [
+      {
+        "id": 288,
+        "literals": [
+          "solidity",
+          "^",
+          "0.4",
+          ".24"
+        ],
+        "nodeType": "PragmaDirective",
+        "src": "0:24:2"
+      },
+      {
+        "baseContracts": [],
+        "contractDependencies": [],
+        "contractKind": "contract",
+        "documentation": null,
+        "fullyImplemented": true,
+        "id": 352,
+        "linearizedBaseContracts": [
+          352
+        ],
+        "name": "LimeFactory",
+        "nodeType": "ContractDefinition",
+        "nodes": [
+          {
+            "constant": false,
+            "id": 290,
+            "name": "slogan",
+            "nodeType": "VariableDeclaration",
+            "scope": 352,
+            "src": "54:14:2",
+            "stateVariable": true,
+            "storageLocation": "default",
+            "typeDescriptions": {
+              "typeIdentifier": "t_bytes32",
+              "typeString": "bytes32"
+            },
+            "typeName": {
+              "id": 289,
+              "name": "bytes32",
+              "nodeType": "ElementaryTypeName",
+              "src": "54:7:2",
+              "typeDescriptions": {
+                "typeIdentifier": "t_bytes32",
+                "typeString": "bytes32"
+              }
+            },
+            "value": null,
+            "visibility": "internal"
+          },
+          {
+            "constant": false,
+            "id": 292,
+            "name": "otherSlogan",
+            "nodeType": "VariableDeclaration",
+            "scope": 352,
+            "src": "74:19:2",
+            "stateVariable": true,
+            "storageLocation": "default",
+            "typeDescriptions": {
+              "typeIdentifier": "t_bytes32",
+              "typeString": "bytes32"
+            },
+            "typeName": {
+              "id": 291,
+              "name": "bytes32",
+              "nodeType": "ElementaryTypeName",
+              "src": "74:7:2",
+              "typeDescriptions": {
+                "typeIdentifier": "t_bytes32",
+                "typeString": "bytes32"
+              }
+            },
+            "value": null,
+            "visibility": "internal"
+          },
+          {
+            "anonymous": false,
+            "documentation": null,
+            "id": 296,
+            "name": "FreshLime",
+            "nodeType": "EventDefinition",
+            "parameters": {
+              "id": 295,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 294,
+                  "indexed": false,
+                  "name": "name",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 296,
+                  "src": "116:11:2",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_string_memory_ptr",
+                    "typeString": "string"
+                  },
+                  "typeName": {
+                    "id": 293,
+                    "name": "string",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "116:6:2",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_string_storage_ptr",
+                      "typeString": "string"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                }
+              ],
+              "src": "115:13:2"
+            },
+            "src": "100:29:2"
+          },
+          {
+            "canonicalName": "LimeFactory.Lime",
+            "id": 305,
+            "members": [
+              {
+                "constant": false,
+                "id": 298,
+                "name": "name",
+                "nodeType": "VariableDeclaration",
+                "scope": 305,
+                "src": "157:11:2",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_string_storage_ptr",
+                  "typeString": "string"
+                },
+                "typeName": {
+                  "id": 297,
+                  "name": "string",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "157:6:2",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_string_storage_ptr",
+                    "typeString": "string"
+                  }
+                },
+                "value": null,
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 300,
+                "name": "carbohydrates",
+                "nodeType": "VariableDeclaration",
+                "scope": 305,
+                "src": "178:19:2",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_uint8",
+                  "typeString": "uint8"
+                },
+                "typeName": {
+                  "id": 299,
+                  "name": "uint8",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "178:5:2",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint8",
+                    "typeString": "uint8"
+                  }
+                },
+                "value": null,
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 302,
+                "name": "fat",
+                "nodeType": "VariableDeclaration",
+                "scope": 305,
+                "src": "207:9:2",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_uint8",
+                  "typeString": "uint8"
+                },
+                "typeName": {
+                  "id": 301,
+                  "name": "uint8",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "207:5:2",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint8",
+                    "typeString": "uint8"
+                  }
+                },
+                "value": null,
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 304,
+                "name": "protein",
+                "nodeType": "VariableDeclaration",
+                "scope": 305,
+                "src": "226:13:2",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_uint8",
+                  "typeString": "uint8"
+                },
+                "typeName": {
+                  "id": 303,
+                  "name": "uint8",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "226:5:2",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint8",
+                    "typeString": "uint8"
+                  }
+                },
+                "value": null,
+                "visibility": "internal"
+              }
+            ],
+            "name": "Lime",
+            "nodeType": "StructDefinition",
+            "scope": 352,
+            "src": "135:111:2",
+            "visibility": "public"
+          },
+          {
+            "constant": false,
+            "id": 308,
+            "name": "limes",
+            "nodeType": "VariableDeclaration",
+            "scope": 352,
+            "src": "252:19:2",
+            "stateVariable": true,
+            "storageLocation": "default",
+            "typeDescriptions": {
+              "typeIdentifier": "t_array$_t_struct$_Lime_$305_storage_$dyn_storage",
+              "typeString": "struct LimeFactory.Lime[]"
+            },
+            "typeName": {
+              "baseType": {
+                "contractScope": null,
+                "id": 306,
+                "name": "Lime",
+                "nodeType": "UserDefinedTypeName",
+                "referencedDeclaration": 305,
+                "src": "252:4:2",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_struct$_Lime_$305_storage_ptr",
+                  "typeString": "struct LimeFactory.Lime"
+                }
+              },
+              "id": 307,
+              "length": null,
+              "nodeType": "ArrayTypeName",
+              "src": "252:6:2",
+              "typeDescriptions": {
+                "typeIdentifier": "t_array$_t_struct$_Lime_$305_storage_$dyn_storage_ptr",
+                "typeString": "struct LimeFactory.Lime[]"
+              }
+            },
+            "value": null,
+            "visibility": "public"
+          },
+          {
+            "body": {
+              "id": 323,
+              "nodeType": "Block",
+              "src": "336:69:2",
+              "statements": [
+                {
+                  "expression": {
+                    "argumentTypes": null,
+                    "id": 317,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "lValueRequested": false,
+                    "leftHandSide": {
+                      "argumentTypes": null,
+                      "id": 315,
+                      "name": "slogan",
+                      "nodeType": "Identifier",
+                      "overloadedDeclarations": [],
+                      "referencedDeclaration": 290,
+                      "src": "346:6:2",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_bytes32",
+                        "typeString": "bytes32"
+                      }
+                    },
+                    "nodeType": "Assignment",
+                    "operator": "=",
+                    "rightHandSide": {
+                      "argumentTypes": null,
+                      "id": 316,
+                      "name": "_slogan",
+                      "nodeType": "Identifier",
+                      "overloadedDeclarations": [],
+                      "referencedDeclaration": 310,
+                      "src": "355:7:2",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_bytes32",
+                        "typeString": "bytes32"
+                      }
+                    },
+                    "src": "346:16:2",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bytes32",
+                      "typeString": "bytes32"
+                    }
+                  },
+                  "id": 318,
+                  "nodeType": "ExpressionStatement",
+                  "src": "346:16:2"
+                },
+                {
+                  "expression": {
+                    "argumentTypes": null,
+                    "id": 321,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "lValueRequested": false,
+                    "leftHandSide": {
+                      "argumentTypes": null,
+                      "id": 319,
+                      "name": "otherSlogan",
+                      "nodeType": "Identifier",
+                      "overloadedDeclarations": [],
+                      "referencedDeclaration": 292,
+                      "src": "372:11:2",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_bytes32",
+                        "typeString": "bytes32"
+                      }
+                    },
+                    "nodeType": "Assignment",
+                    "operator": "=",
+                    "rightHandSide": {
+                      "argumentTypes": null,
+                      "id": 320,
+                      "name": "_otherSlogan",
+                      "nodeType": "Identifier",
+                      "overloadedDeclarations": [],
+                      "referencedDeclaration": 312,
+                      "src": "386:12:2",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_bytes32",
+                        "typeString": "bytes32"
+                      }
+                    },
+                    "src": "372:26:2",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bytes32",
+                      "typeString": "bytes32"
+                    }
+                  },
+                  "id": 322,
+                  "nodeType": "ExpressionStatement",
+                  "src": "372:26:2"
+                }
+              ]
+            },
+            "documentation": null,
+            "id": 324,
+            "implemented": true,
+            "isConstructor": true,
+            "isDeclaredConst": false,
+            "modifiers": [],
+            "name": "",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 313,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 310,
+                  "name": "_slogan",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 324,
+                  "src": "290:15:2",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bytes32",
+                    "typeString": "bytes32"
+                  },
+                  "typeName": {
+                    "id": 309,
+                    "name": "bytes32",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "290:7:2",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bytes32",
+                      "typeString": "bytes32"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 312,
+                  "name": "_otherSlogan",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 324,
+                  "src": "307:20:2",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bytes32",
+                    "typeString": "bytes32"
+                  },
+                  "typeName": {
+                    "id": 311,
+                    "name": "bytes32",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "307:7:2",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bytes32",
+                      "typeString": "bytes32"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                }
+              ],
+              "src": "289:39:2"
+            },
+            "payable": false,
+            "returnParameters": {
+              "id": 314,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "336:0:2"
+            },
+            "scope": 352,
+            "src": "278:127:2",
+            "stateMutability": "nonpayable",
+            "superFunction": null,
+            "visibility": "public"
+          },
+          {
+            "body": {
+              "id": 350,
+              "nodeType": "Block",
+              "src": "504:103:2",
+              "statements": [
+                {
+                  "expression": {
+                    "argumentTypes": null,
+                    "arguments": [
+                      {
+                        "argumentTypes": null,
+                        "arguments": [
+                          {
+                            "argumentTypes": null,
+                            "id": 339,
+                            "name": "_name",
+                            "nodeType": "Identifier",
+                            "overloadedDeclarations": [],
+                            "referencedDeclaration": 326,
+                            "src": "530:5:2",
+                            "typeDescriptions": {
+                              "typeIdentifier": "t_string_memory_ptr",
+                              "typeString": "string memory"
+                            }
+                          },
+                          {
+                            "argumentTypes": null,
+                            "id": 340,
+                            "name": "_carbohydrates",
+                            "nodeType": "Identifier",
+                            "overloadedDeclarations": [],
+                            "referencedDeclaration": 328,
+                            "src": "537:14:2",
+                            "typeDescriptions": {
+                              "typeIdentifier": "t_uint8",
+                              "typeString": "uint8"
+                            }
+                          },
+                          {
+                            "argumentTypes": null,
+                            "id": 341,
+                            "name": "_fat",
+                            "nodeType": "Identifier",
+                            "overloadedDeclarations": [],
+                            "referencedDeclaration": 330,
+                            "src": "553:4:2",
+                            "typeDescriptions": {
+                              "typeIdentifier": "t_uint8",
+                              "typeString": "uint8"
+                            }
+                          },
+                          {
+                            "argumentTypes": null,
+                            "id": 342,
+                            "name": "_protein",
+                            "nodeType": "Identifier",
+                            "overloadedDeclarations": [],
+                            "referencedDeclaration": 332,
+                            "src": "559:8:2",
+                            "typeDescriptions": {
+                              "typeIdentifier": "t_uint8",
+                              "typeString": "uint8"
+                            }
+                          }
+                        ],
+                        "expression": {
+                          "argumentTypes": [
+                            {
+                              "typeIdentifier": "t_string_memory_ptr",
+                              "typeString": "string memory"
+                            },
+                            {
+                              "typeIdentifier": "t_uint8",
+                              "typeString": "uint8"
+                            },
+                            {
+                              "typeIdentifier": "t_uint8",
+                              "typeString": "uint8"
+                            },
+                            {
+                              "typeIdentifier": "t_uint8",
+                              "typeString": "uint8"
+                            }
+                          ],
+                          "id": 338,
+                          "name": "Lime",
+                          "nodeType": "Identifier",
+                          "overloadedDeclarations": [],
+                          "referencedDeclaration": 305,
+                          "src": "525:4:2",
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_type$_t_struct$_Lime_$305_storage_ptr_$",
+                            "typeString": "type(struct LimeFactory.Lime storage pointer)"
+                          }
+                        },
+                        "id": 343,
+                        "isConstant": false,
+                        "isLValue": false,
+                        "isPure": false,
+                        "kind": "structConstructorCall",
+                        "lValueRequested": false,
+                        "names": [],
+                        "nodeType": "FunctionCall",
+                        "src": "525:43:2",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_struct$_Lime_$305_memory",
+                          "typeString": "struct LimeFactory.Lime memory"
+                        }
+                      }
+                    ],
+                    "expression": {
+                      "argumentTypes": [
+                        {
+                          "typeIdentifier": "t_struct$_Lime_$305_memory",
+                          "typeString": "struct LimeFactory.Lime memory"
+                        }
+                      ],
+                      "expression": {
+                        "argumentTypes": null,
+                        "id": 335,
+                        "name": "limes",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 308,
+                        "src": "514:5:2",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_array$_t_struct$_Lime_$305_storage_$dyn_storage",
+                          "typeString": "struct LimeFactory.Lime storage ref[] storage ref"
+                        }
+                      },
+                      "id": 337,
+                      "isConstant": false,
+                      "isLValue": false,
+                      "isPure": false,
+                      "lValueRequested": false,
+                      "memberName": "push",
+                      "nodeType": "MemberAccess",
+                      "referencedDeclaration": null,
+                      "src": "514:10:2",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_function_arraypush_nonpayable$_t_struct$_Lime_$305_storage_$returns$_t_uint256_$",
+                        "typeString": "function (struct LimeFactory.Lime storage ref) returns (uint256)"
+                      }
+                    },
+                    "id": 344,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "kind": "functionCall",
+                    "lValueRequested": false,
+                    "names": [],
+                    "nodeType": "FunctionCall",
+                    "src": "514:55:2",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "id": 345,
+                  "nodeType": "ExpressionStatement",
+                  "src": "514:55:2"
+                },
+                {
+                  "eventCall": {
+                    "argumentTypes": null,
+                    "arguments": [
+                      {
+                        "argumentTypes": null,
+                        "id": 347,
+                        "name": "_name",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 326,
+                        "src": "594:5:2",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_string_memory_ptr",
+                          "typeString": "string memory"
+                        }
+                      }
+                    ],
+                    "expression": {
+                      "argumentTypes": [
+                        {
+                          "typeIdentifier": "t_string_memory_ptr",
+                          "typeString": "string memory"
+                        }
+                      ],
+                      "id": 346,
+                      "name": "FreshLime",
+                      "nodeType": "Identifier",
+                      "overloadedDeclarations": [],
+                      "referencedDeclaration": 296,
+                      "src": "584:9:2",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_function_event_nonpayable$_t_string_memory_ptr_$returns$__$",
+                        "typeString": "function (string memory)"
+                      }
+                    },
+                    "id": 348,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "kind": "functionCall",
+                    "lValueRequested": false,
+                    "names": [],
+                    "nodeType": "FunctionCall",
+                    "src": "584:16:2",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_tuple$__$",
+                      "typeString": "tuple()"
+                    }
+                  },
+                  "id": 349,
+                  "nodeType": "EmitStatement",
+                  "src": "579:21:2"
+                }
+              ]
+            },
+            "documentation": null,
+            "id": 351,
+            "implemented": true,
+            "isConstructor": false,
+            "isDeclaredConst": false,
+            "modifiers": [],
+            "name": "createLime",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 333,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 326,
+                  "name": "_name",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 351,
+                  "src": "431:12:2",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_string_memory_ptr",
+                    "typeString": "string"
+                  },
+                  "typeName": {
+                    "id": 325,
+                    "name": "string",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "431:6:2",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_string_storage_ptr",
+                      "typeString": "string"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 328,
+                  "name": "_carbohydrates",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 351,
+                  "src": "445:20:2",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint8",
+                    "typeString": "uint8"
+                  },
+                  "typeName": {
+                    "id": 327,
+                    "name": "uint8",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "445:5:2",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint8",
+                      "typeString": "uint8"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 330,
+                  "name": "_fat",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 351,
+                  "src": "467:10:2",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint8",
+                    "typeString": "uint8"
+                  },
+                  "typeName": {
+                    "id": 329,
+                    "name": "uint8",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "467:5:2",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint8",
+                      "typeString": "uint8"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 332,
+                  "name": "_protein",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 351,
+                  "src": "479:14:2",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint8",
+                    "typeString": "uint8"
+                  },
+                  "typeName": {
+                    "id": 331,
+                    "name": "uint8",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "479:5:2",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint8",
+                      "typeString": "uint8"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                }
+              ],
+              "src": "430:64:2"
+            },
+            "payable": false,
+            "returnParameters": {
+              "id": 334,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "504:0:2"
+            },
+            "scope": 352,
+            "src": "411:196:2",
+            "stateMutability": "nonpayable",
+            "superFunction": null,
+            "visibility": "internal"
+          }
+        ],
+        "scope": 353,
+        "src": "26:583:2"
+      }
+    ],
+    "src": "0:609:2"
+  },
+  "legacyAST": {
+    "absolutePath": "/Users/martingrigorov/Documents/Lectures/Contracts/contracts/LimeFactory.sol",
+    "exportedSymbols": {
+      "LimeFactory": [
+        352
+      ]
+    },
+    "id": 353,
+    "nodeType": "SourceUnit",
+    "nodes": [
+      {
+        "id": 288,
+        "literals": [
+          "solidity",
+          "^",
+          "0.4",
+          ".24"
+        ],
+        "nodeType": "PragmaDirective",
+        "src": "0:24:2"
+      },
+      {
+        "baseContracts": [],
+        "contractDependencies": [],
+        "contractKind": "contract",
+        "documentation": null,
+        "fullyImplemented": true,
+        "id": 352,
+        "linearizedBaseContracts": [
+          352
+        ],
+        "name": "LimeFactory",
+        "nodeType": "ContractDefinition",
+        "nodes": [
+          {
+            "constant": false,
+            "id": 290,
+            "name": "slogan",
+            "nodeType": "VariableDeclaration",
+            "scope": 352,
+            "src": "54:14:2",
+            "stateVariable": true,
+            "storageLocation": "default",
+            "typeDescriptions": {
+              "typeIdentifier": "t_bytes32",
+              "typeString": "bytes32"
+            },
+            "typeName": {
+              "id": 289,
+              "name": "bytes32",
+              "nodeType": "ElementaryTypeName",
+              "src": "54:7:2",
+              "typeDescriptions": {
+                "typeIdentifier": "t_bytes32",
+                "typeString": "bytes32"
+              }
+            },
+            "value": null,
+            "visibility": "internal"
+          },
+          {
+            "constant": false,
+            "id": 292,
+            "name": "otherSlogan",
+            "nodeType": "VariableDeclaration",
+            "scope": 352,
+            "src": "74:19:2",
+            "stateVariable": true,
+            "storageLocation": "default",
+            "typeDescriptions": {
+              "typeIdentifier": "t_bytes32",
+              "typeString": "bytes32"
+            },
+            "typeName": {
+              "id": 291,
+              "name": "bytes32",
+              "nodeType": "ElementaryTypeName",
+              "src": "74:7:2",
+              "typeDescriptions": {
+                "typeIdentifier": "t_bytes32",
+                "typeString": "bytes32"
+              }
+            },
+            "value": null,
+            "visibility": "internal"
+          },
+          {
+            "anonymous": false,
+            "documentation": null,
+            "id": 296,
+            "name": "FreshLime",
+            "nodeType": "EventDefinition",
+            "parameters": {
+              "id": 295,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 294,
+                  "indexed": false,
+                  "name": "name",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 296,
+                  "src": "116:11:2",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_string_memory_ptr",
+                    "typeString": "string"
+                  },
+                  "typeName": {
+                    "id": 293,
+                    "name": "string",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "116:6:2",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_string_storage_ptr",
+                      "typeString": "string"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                }
+              ],
+              "src": "115:13:2"
+            },
+            "src": "100:29:2"
+          },
+          {
+            "canonicalName": "LimeFactory.Lime",
+            "id": 305,
+            "members": [
+              {
+                "constant": false,
+                "id": 298,
+                "name": "name",
+                "nodeType": "VariableDeclaration",
+                "scope": 305,
+                "src": "157:11:2",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_string_storage_ptr",
+                  "typeString": "string"
+                },
+                "typeName": {
+                  "id": 297,
+                  "name": "string",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "157:6:2",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_string_storage_ptr",
+                    "typeString": "string"
+                  }
+                },
+                "value": null,
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 300,
+                "name": "carbohydrates",
+                "nodeType": "VariableDeclaration",
+                "scope": 305,
+                "src": "178:19:2",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_uint8",
+                  "typeString": "uint8"
+                },
+                "typeName": {
+                  "id": 299,
+                  "name": "uint8",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "178:5:2",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint8",
+                    "typeString": "uint8"
+                  }
+                },
+                "value": null,
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 302,
+                "name": "fat",
+                "nodeType": "VariableDeclaration",
+                "scope": 305,
+                "src": "207:9:2",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_uint8",
+                  "typeString": "uint8"
+                },
+                "typeName": {
+                  "id": 301,
+                  "name": "uint8",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "207:5:2",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint8",
+                    "typeString": "uint8"
+                  }
+                },
+                "value": null,
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 304,
+                "name": "protein",
+                "nodeType": "VariableDeclaration",
+                "scope": 305,
+                "src": "226:13:2",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_uint8",
+                  "typeString": "uint8"
+                },
+                "typeName": {
+                  "id": 303,
+                  "name": "uint8",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "226:5:2",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint8",
+                    "typeString": "uint8"
+                  }
+                },
+                "value": null,
+                "visibility": "internal"
+              }
+            ],
+            "name": "Lime",
+            "nodeType": "StructDefinition",
+            "scope": 352,
+            "src": "135:111:2",
+            "visibility": "public"
+          },
+          {
+            "constant": false,
+            "id": 308,
+            "name": "limes",
+            "nodeType": "VariableDeclaration",
+            "scope": 352,
+            "src": "252:19:2",
+            "stateVariable": true,
+            "storageLocation": "default",
+            "typeDescriptions": {
+              "typeIdentifier": "t_array$_t_struct$_Lime_$305_storage_$dyn_storage",
+              "typeString": "struct LimeFactory.Lime[]"
+            },
+            "typeName": {
+              "baseType": {
+                "contractScope": null,
+                "id": 306,
+                "name": "Lime",
+                "nodeType": "UserDefinedTypeName",
+                "referencedDeclaration": 305,
+                "src": "252:4:2",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_struct$_Lime_$305_storage_ptr",
+                  "typeString": "struct LimeFactory.Lime"
+                }
+              },
+              "id": 307,
+              "length": null,
+              "nodeType": "ArrayTypeName",
+              "src": "252:6:2",
+              "typeDescriptions": {
+                "typeIdentifier": "t_array$_t_struct$_Lime_$305_storage_$dyn_storage_ptr",
+                "typeString": "struct LimeFactory.Lime[]"
+              }
+            },
+            "value": null,
+            "visibility": "public"
+          },
+          {
+            "body": {
+              "id": 323,
+              "nodeType": "Block",
+              "src": "336:69:2",
+              "statements": [
+                {
+                  "expression": {
+                    "argumentTypes": null,
+                    "id": 317,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "lValueRequested": false,
+                    "leftHandSide": {
+                      "argumentTypes": null,
+                      "id": 315,
+                      "name": "slogan",
+                      "nodeType": "Identifier",
+                      "overloadedDeclarations": [],
+                      "referencedDeclaration": 290,
+                      "src": "346:6:2",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_bytes32",
+                        "typeString": "bytes32"
+                      }
+                    },
+                    "nodeType": "Assignment",
+                    "operator": "=",
+                    "rightHandSide": {
+                      "argumentTypes": null,
+                      "id": 316,
+                      "name": "_slogan",
+                      "nodeType": "Identifier",
+                      "overloadedDeclarations": [],
+                      "referencedDeclaration": 310,
+                      "src": "355:7:2",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_bytes32",
+                        "typeString": "bytes32"
+                      }
+                    },
+                    "src": "346:16:2",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bytes32",
+                      "typeString": "bytes32"
+                    }
+                  },
+                  "id": 318,
+                  "nodeType": "ExpressionStatement",
+                  "src": "346:16:2"
+                },
+                {
+                  "expression": {
+                    "argumentTypes": null,
+                    "id": 321,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "lValueRequested": false,
+                    "leftHandSide": {
+                      "argumentTypes": null,
+                      "id": 319,
+                      "name": "otherSlogan",
+                      "nodeType": "Identifier",
+                      "overloadedDeclarations": [],
+                      "referencedDeclaration": 292,
+                      "src": "372:11:2",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_bytes32",
+                        "typeString": "bytes32"
+                      }
+                    },
+                    "nodeType": "Assignment",
+                    "operator": "=",
+                    "rightHandSide": {
+                      "argumentTypes": null,
+                      "id": 320,
+                      "name": "_otherSlogan",
+                      "nodeType": "Identifier",
+                      "overloadedDeclarations": [],
+                      "referencedDeclaration": 312,
+                      "src": "386:12:2",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_bytes32",
+                        "typeString": "bytes32"
+                      }
+                    },
+                    "src": "372:26:2",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bytes32",
+                      "typeString": "bytes32"
+                    }
+                  },
+                  "id": 322,
+                  "nodeType": "ExpressionStatement",
+                  "src": "372:26:2"
+                }
+              ]
+            },
+            "documentation": null,
+            "id": 324,
+            "implemented": true,
+            "isConstructor": true,
+            "isDeclaredConst": false,
+            "modifiers": [],
+            "name": "",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 313,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 310,
+                  "name": "_slogan",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 324,
+                  "src": "290:15:2",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bytes32",
+                    "typeString": "bytes32"
+                  },
+                  "typeName": {
+                    "id": 309,
+                    "name": "bytes32",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "290:7:2",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bytes32",
+                      "typeString": "bytes32"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 312,
+                  "name": "_otherSlogan",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 324,
+                  "src": "307:20:2",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bytes32",
+                    "typeString": "bytes32"
+                  },
+                  "typeName": {
+                    "id": 311,
+                    "name": "bytes32",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "307:7:2",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bytes32",
+                      "typeString": "bytes32"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                }
+              ],
+              "src": "289:39:2"
+            },
+            "payable": false,
+            "returnParameters": {
+              "id": 314,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "336:0:2"
+            },
+            "scope": 352,
+            "src": "278:127:2",
+            "stateMutability": "nonpayable",
+            "superFunction": null,
+            "visibility": "public"
+          },
+          {
+            "body": {
+              "id": 350,
+              "nodeType": "Block",
+              "src": "504:103:2",
+              "statements": [
+                {
+                  "expression": {
+                    "argumentTypes": null,
+                    "arguments": [
+                      {
+                        "argumentTypes": null,
+                        "arguments": [
+                          {
+                            "argumentTypes": null,
+                            "id": 339,
+                            "name": "_name",
+                            "nodeType": "Identifier",
+                            "overloadedDeclarations": [],
+                            "referencedDeclaration": 326,
+                            "src": "530:5:2",
+                            "typeDescriptions": {
+                              "typeIdentifier": "t_string_memory_ptr",
+                              "typeString": "string memory"
+                            }
+                          },
+                          {
+                            "argumentTypes": null,
+                            "id": 340,
+                            "name": "_carbohydrates",
+                            "nodeType": "Identifier",
+                            "overloadedDeclarations": [],
+                            "referencedDeclaration": 328,
+                            "src": "537:14:2",
+                            "typeDescriptions": {
+                              "typeIdentifier": "t_uint8",
+                              "typeString": "uint8"
+                            }
+                          },
+                          {
+                            "argumentTypes": null,
+                            "id": 341,
+                            "name": "_fat",
+                            "nodeType": "Identifier",
+                            "overloadedDeclarations": [],
+                            "referencedDeclaration": 330,
+                            "src": "553:4:2",
+                            "typeDescriptions": {
+                              "typeIdentifier": "t_uint8",
+                              "typeString": "uint8"
+                            }
+                          },
+                          {
+                            "argumentTypes": null,
+                            "id": 342,
+                            "name": "_protein",
+                            "nodeType": "Identifier",
+                            "overloadedDeclarations": [],
+                            "referencedDeclaration": 332,
+                            "src": "559:8:2",
+                            "typeDescriptions": {
+                              "typeIdentifier": "t_uint8",
+                              "typeString": "uint8"
+                            }
+                          }
+                        ],
+                        "expression": {
+                          "argumentTypes": [
+                            {
+                              "typeIdentifier": "t_string_memory_ptr",
+                              "typeString": "string memory"
+                            },
+                            {
+                              "typeIdentifier": "t_uint8",
+                              "typeString": "uint8"
+                            },
+                            {
+                              "typeIdentifier": "t_uint8",
+                              "typeString": "uint8"
+                            },
+                            {
+                              "typeIdentifier": "t_uint8",
+                              "typeString": "uint8"
+                            }
+                          ],
+                          "id": 338,
+                          "name": "Lime",
+                          "nodeType": "Identifier",
+                          "overloadedDeclarations": [],
+                          "referencedDeclaration": 305,
+                          "src": "525:4:2",
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_type$_t_struct$_Lime_$305_storage_ptr_$",
+                            "typeString": "type(struct LimeFactory.Lime storage pointer)"
+                          }
+                        },
+                        "id": 343,
+                        "isConstant": false,
+                        "isLValue": false,
+                        "isPure": false,
+                        "kind": "structConstructorCall",
+                        "lValueRequested": false,
+                        "names": [],
+                        "nodeType": "FunctionCall",
+                        "src": "525:43:2",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_struct$_Lime_$305_memory",
+                          "typeString": "struct LimeFactory.Lime memory"
+                        }
+                      }
+                    ],
+                    "expression": {
+                      "argumentTypes": [
+                        {
+                          "typeIdentifier": "t_struct$_Lime_$305_memory",
+                          "typeString": "struct LimeFactory.Lime memory"
+                        }
+                      ],
+                      "expression": {
+                        "argumentTypes": null,
+                        "id": 335,
+                        "name": "limes",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 308,
+                        "src": "514:5:2",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_array$_t_struct$_Lime_$305_storage_$dyn_storage",
+                          "typeString": "struct LimeFactory.Lime storage ref[] storage ref"
+                        }
+                      },
+                      "id": 337,
+                      "isConstant": false,
+                      "isLValue": false,
+                      "isPure": false,
+                      "lValueRequested": false,
+                      "memberName": "push",
+                      "nodeType": "MemberAccess",
+                      "referencedDeclaration": null,
+                      "src": "514:10:2",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_function_arraypush_nonpayable$_t_struct$_Lime_$305_storage_$returns$_t_uint256_$",
+                        "typeString": "function (struct LimeFactory.Lime storage ref) returns (uint256)"
+                      }
+                    },
+                    "id": 344,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "kind": "functionCall",
+                    "lValueRequested": false,
+                    "names": [],
+                    "nodeType": "FunctionCall",
+                    "src": "514:55:2",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "id": 345,
+                  "nodeType": "ExpressionStatement",
+                  "src": "514:55:2"
+                },
+                {
+                  "eventCall": {
+                    "argumentTypes": null,
+                    "arguments": [
+                      {
+                        "argumentTypes": null,
+                        "id": 347,
+                        "name": "_name",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 326,
+                        "src": "594:5:2",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_string_memory_ptr",
+                          "typeString": "string memory"
+                        }
+                      }
+                    ],
+                    "expression": {
+                      "argumentTypes": [
+                        {
+                          "typeIdentifier": "t_string_memory_ptr",
+                          "typeString": "string memory"
+                        }
+                      ],
+                      "id": 346,
+                      "name": "FreshLime",
+                      "nodeType": "Identifier",
+                      "overloadedDeclarations": [],
+                      "referencedDeclaration": 296,
+                      "src": "584:9:2",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_function_event_nonpayable$_t_string_memory_ptr_$returns$__$",
+                        "typeString": "function (string memory)"
+                      }
+                    },
+                    "id": 348,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "kind": "functionCall",
+                    "lValueRequested": false,
+                    "names": [],
+                    "nodeType": "FunctionCall",
+                    "src": "584:16:2",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_tuple$__$",
+                      "typeString": "tuple()"
+                    }
+                  },
+                  "id": 349,
+                  "nodeType": "EmitStatement",
+                  "src": "579:21:2"
+                }
+              ]
+            },
+            "documentation": null,
+            "id": 351,
+            "implemented": true,
+            "isConstructor": false,
+            "isDeclaredConst": false,
+            "modifiers": [],
+            "name": "createLime",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 333,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 326,
+                  "name": "_name",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 351,
+                  "src": "431:12:2",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_string_memory_ptr",
+                    "typeString": "string"
+                  },
+                  "typeName": {
+                    "id": 325,
+                    "name": "string",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "431:6:2",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_string_storage_ptr",
+                      "typeString": "string"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 328,
+                  "name": "_carbohydrates",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 351,
+                  "src": "445:20:2",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint8",
+                    "typeString": "uint8"
+                  },
+                  "typeName": {
+                    "id": 327,
+                    "name": "uint8",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "445:5:2",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint8",
+                      "typeString": "uint8"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 330,
+                  "name": "_fat",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 351,
+                  "src": "467:10:2",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint8",
+                    "typeString": "uint8"
+                  },
+                  "typeName": {
+                    "id": 329,
+                    "name": "uint8",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "467:5:2",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint8",
+                      "typeString": "uint8"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 332,
+                  "name": "_protein",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 351,
+                  "src": "479:14:2",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint8",
+                    "typeString": "uint8"
+                  },
+                  "typeName": {
+                    "id": 331,
+                    "name": "uint8",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "479:5:2",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint8",
+                      "typeString": "uint8"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                }
+              ],
+              "src": "430:64:2"
+            },
+            "payable": false,
+            "returnParameters": {
+              "id": 334,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "504:0:2"
+            },
+            "scope": 352,
+            "src": "411:196:2",
+            "stateMutability": "nonpayable",
+            "superFunction": null,
+            "visibility": "internal"
+          }
+        ],
+        "scope": 353,
+        "src": "26:583:2"
+      }
+    ],
+    "src": "0:609:2"
+  },
+  "compiler": {
+    "name": "solc",
+    "version": "0.4.25+commit.59dbf8f1.Emscripten.clang"
+  },
+  "networks": {},
+  "schemaVersion": "0.9.6",
+  "updatedAt": "2018-11-18T19:56:04.255Z"
+}
