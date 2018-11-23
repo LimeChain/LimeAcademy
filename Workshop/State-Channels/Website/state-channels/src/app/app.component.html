@@ -6,18 +6,39 @@
   </div>
   <div class="row">
     <div class="col-12 text-center state-col">
-      <input type="text" [(ngModel)]="privateKey" placeholder="Your privateKey">
-      <button class="btn btn-info" (click)="functionButton1()">Button1</button>
+      <input type="password" [(ngModel)]="privateKey" placeholder="Your privateKey">
+      <button class="btn btn-info" (click)="unlockWallet()">Unlock Wallet</button>
+    </div>
+  </div>
+  <div class="row" id="walletBalance">
+    <div class="col-12 text-center">
+      <h2>{{ balance }}</h2>
     </div>
   </div>
   <div class="row">
     <div class="col-12 text-center state-col">
-      <button class="btn btn-info" (click)="functionButton2()">Button1</button>
+      <button class="btn btn-info" (click)="rock()">rock</button>
     </div>
   </div>
   <div class="row">
     <div class="col-12 text-center state-col">
-      <button class="btn btn-info" (click)="functionButton3()">Button1</button>
+      <button class="btn btn-info" (click)="paper()">paper</button>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-12 text-center state-col">
+      <button class="btn btn-info" (click)="scissors()">scissors</button>
+    </div>
+  </div>
+  <div class="row" id="info">
+    <div class="col-12 text-center">
+      <h2>{{ stateText }}</h2>
+    </div>
+  </div>
+  <br>
+  <div class="row" id="turnInfo">
+    <div class="col-12 text-center">
+      <p>{{ turnInfo }}</p>
     </div>
   </div>
   <br>
