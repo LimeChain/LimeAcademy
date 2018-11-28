@@ -4,17 +4,23 @@ import * as IPFS from 'ipfs';
 import * as Room from 'ipfs-pubsub-room';
 declare const Buffer;
 
+const ECTools = require('../contracts-json/ECTools.json');
+const RSP = require('../contracts-json/RSP.json');
+
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss']
 })
 export class AppComponent {
+  public playerOne: any;
+  public playerTwo: any;
   public myScore = 5;
   public opponentScore = 5;
   public lastMove: string;
   public privateKey: string;
-  public revealMsg: string;
+  public ethersDeposit: string;
+  public contractAddress: string;
   public stateText = 'Loading peers...';
   public turnInfo = '';
   public balance: string;
@@ -24,7 +30,8 @@ export class AppComponent {
   public nonce = 0;
   public randNum: number;
   constructor(private changeDetection: ChangeDetectorRef) {
-    this.networkProvider = new ethers.providers.InfuraProvider('ropsten', 'jLCpladxNxIQQ2IbJ2Aw');
+    // this.networkProvider = new ethers.providers.InfuraProvider('ropsten', 'jLCpladxNxIQQ2IbJ2Aw');
+    this.networkProvider = new ethers.providers.JsonRpcProvider('http://localhost:8545');
     const ipfs = new IPFS({
       repo: repo(),
       EXPERIMENTAL: {
@@ -46,7 +53,7 @@ export class AppComponent {
       console.log('IPFS node ready with address ' + info.id);
     }));
 
-    this.room = Room(ipfs, 'stateChannel');
+    this.room = Room(ipfs, 'stateChannelDemo');
 
     this.room.on('peer joined', (peer) => {
       console.log(`${peer} joined`);
@@ -75,8 +82,13 @@ export class AppComponent {
         // window.sessionStorage.setItem('state' + (this.nonce - 1).toString(), stateHash);
       } else if (data.type === 'state') {
         console.log(data);
-        console.log(message.data.toString());
-        window.sessionStorage.setItem(data.type + data.nonce, message.data);
+        window.sessionStorage.setItem(data.type + data.nonce, data);
+      } else if (data.type === 'playerOne') {
+      console.log(data.address);
+      this.playerOne = data.address;
+    } else if (data.type === 'playerTwo') {
+        console.log(data.address);
+        this.playerTwo = data.address;
       }
     });
 
@@ -221,5 +233,41 @@ export class AppComponent {
     const signature = await this.wallet.signMessage(hashData);
 
     return JSON.stringify({'type': 'state', 'nonce': this.nonce - 1, 'myScore': this.myScore, 'opponentScore': this.opponentScore, 'sig': signature});
+  }
+
+  public async openChannel() {
+    const wei = ethers.utils.parseEther(this.ethersDeposit);
+    const rspInstance = new ethers.Contract(this.contractAddress, RSP.abi, this.networkProvider);
+
+    const rspInstanceForPlOne = await rspInstance.connect(this.wallet);
+    await rspInstanceForPlOne.openChannel({
+      value: wei
+    });
+
+    this.playerOne = this.wallet.address;
+    console.log(this.playerOne);
+
+    const playerOne  = JSON.stringify({'type': `playerOne`, 'address': this.playerOne});
+    this.sendPlayer(playerOne);
+  }
+
+  public async joinChannel() {
+    const wei = ethers.utils.parseEther(this.ethersDeposit);
+    const rspInstance = new ethers.Contract(this.contractAddress, RSP.abi, this.networkProvider);
+
+    const rspInstanceForPlTwo = await rspInstance.connect(this.wallet);
+    await rspInstanceForPlTwo.joinChannel({
+      value: wei
+    });
+
+    this.playerTwo = this.wallet.address;
+
+    const playerTwo  = JSON.stringify({'type': `playerTwo`, 'address': this.playerTwo});
+    this.sendPlayer(playerTwo);
+  }
+
+  public sendPlayer(playerAddress) {
+    const peers = this.room.getPeers();
+    this.room.sendTo(peers[0], playerAddress);
   }
 }

@@ -9,6 +9,9 @@
       <input type="password" [(ngModel)]="privateKey" placeholder="Your privateKey">
       <button class="btn btn-info" (click)="unlockWallet()">Unlock Wallet</button>
       <button class="btn btn-info" (click)="revealLastMove()">Reveal Move</button>
+      <input type="text" [(ngModel)]="contractAddress" placeholder="Contract Address">
+      <input type="text" [(ngModel)]="ethersDeposit" placeholder="Ethers Deposit">
+      <button class="btn btn-info" (click)="openChannel()">initChannel</button>
     </div>
   </div>
   <div class="row" id="walletBalance">
