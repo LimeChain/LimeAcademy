@@ -10,7 +10,11 @@ declare const Buffer;
   styleUrls: ['./app.component.scss']
 })
 export class AppComponent {
+  public myScore = 5;
+  public opponentScore = 5;
+  public lastMove: string;
   public privateKey: string;
+  public revealMsg: string;
   public stateText = 'Loading peers...';
   public turnInfo = '';
   public balance: string;
@@ -29,7 +33,8 @@ export class AppComponent {
       config: {
         Addresses: {
           Swarm: [
-            '/dns4/ws-star.discovery.libp2p.io/tcp/443/wss/p2p-websocket-star'
+            '/dnsaddr/ws-star.discovery.libp2p.io/tcp/443/wss/p2p-websocket-star'
+            // '/dns4/ws-star.discovery.libp2p.io/tcp/443/wss/p2p-websocket-star/'
           ]
         }
       }
@@ -53,9 +58,26 @@ export class AppComponent {
       console.log(`${peer} left`);
       this.changeDetection.detectChanges();
     });
-    this.room.on('message', (message) => {
-      // const data = JSON.parse(message.data.toString());
-      console.log(message.data);
+    this.room.on('message', async (message) => {
+      const data = JSON.parse(message.data.toString());
+      if (data.type === 'commit') {
+        window.sessionStorage.setItem(data.type + data.nonce, message.data);
+
+        const confirmHash = await this.signConfirmCommit(data.sig, data.nonce);
+        await this.sendHash(confirmHash);
+      } else if (data.type === 'confirmCommit') {
+        window.sessionStorage.setItem(data.type + data.nonce, message.data);
+      } else if (data.type === 'reveal') {
+        this.decryptOpponentMove(data);
+        this.defineWinner(data);
+        const stateHash = await this.signState();
+        await this.sendHash(stateHash);
+        // window.sessionStorage.setItem('state' + (this.nonce - 1).toString(), stateHash);
+      } else if (data.type === 'state') {
+        console.log(data);
+        console.log(message.data.toString());
+        window.sessionStorage.setItem(data.type + data.nonce, message.data);
+      }
     });
 
     function repo() {
@@ -71,35 +93,133 @@ export class AppComponent {
   }
 
   public async rock() {
-    await this.sendMoveHash('Rock');
+    this.lastMove = 'Rock';
+    const moveHash = await this.signMove(this.lastMove);
+    await this.sendHash(moveHash);
+
+    const myTurn  = JSON.stringify({'type': `myTurn`, 'move': this.lastMove, 'randNum': this.randNum, 'nonce': this.nonce});
+    window.sessionStorage.setItem('myTurn' + this.nonce.toString(), myTurn);
+
+    this.turnInfo += `move: ${this.lastMove}, nonce: ${this.nonce}, randNum: ${this.randNum}`;
+    this.changeDetection.detectChanges();
+    this.nonce++;
   }
 
   public async paper() {
-    await this.sendMoveHash('Paper');
-    // const test = window.localStorage.getItem('ogi');
+    this.lastMove = 'Paper';
+    const moveHash = await this.signMove(this.lastMove);
+    await this.sendHash(moveHash);
+
+    const myTurn  = JSON.stringify({'type': `myTurn`, 'move': this.lastMove, 'randNum': this.randNum, 'nonce': this.nonce});
+    window.sessionStorage.setItem('myTurn' + this.nonce.toString(), myTurn);
+
+    this.turnInfo += `move: ${this.lastMove}, nonce: ${this.nonce}, randNum: ${this.randNum}`;
+    this.changeDetection.detectChanges();
+    this.nonce++;
   }
 
   public async scissors() {
-    await this.sendMoveHash('Scissors');
-    // window.localStorage.setItem('ogi', '123');
+    this.lastMove = 'Scissors';
+    const moveHash = await this.signMove(this.lastMove);
+    await this.sendHash(moveHash);
+
+    const myTurn  = JSON.stringify({'type': `myTurn`, 'move': this.lastMove, 'randNum': this.randNum, 'nonce': this.nonce});
+    window.sessionStorage.setItem('myTurn' + this.nonce.toString(), myTurn);
+
+    this.turnInfo += `move: ${this.lastMove}, nonce: ${this.nonce}, randNum: ${this.randNum}`;
+    this.changeDetection.detectChanges();
+    this.nonce++;
   }
 
-  public async sendMoveHash(move) {
-    console.log(move);
+  public async signMove(move) {
     this.randNum = Math.floor(Math.random() * (1000 - 1) + 1);
 
     const hashMsg = ethers.utils.solidityKeccak256(['string', 'int', 'int'], [move, this.nonce, this.randNum]);
     const hashData = ethers.utils.arrayify(hashMsg);
     const signature = await this.wallet.signMessage(hashData);
 
-    const msg  = JSON.stringify({'sig': signature, 'move': move, 'randNum': this.randNum});
-    window.localStorage.setItem(this.nonce.toString(), msg);
+    return JSON.stringify({'type': 'commit', 'nonce': this.nonce, 'sig': signature});
+  }
 
+  public async signConfirmCommit(commit, nonce) {
+    const hashMsg = ethers.utils.solidityKeccak256(['string'], [commit]);
+    const hashData = ethers.utils.arrayify(hashMsg);
+    const signature = await this.wallet.signMessage(hashData);
+
+    return JSON.stringify({'type': 'confirmCommit', 'nonce': nonce, 'sig': signature});
+  }
+
+  public revealLastMove() {
     const peers = this.room.getPeers();
-    this.room.sendTo(peers[0], signature);
+    const revealMsg = JSON.stringify({'type': 'reveal', 'move': this.lastMove, 'randNum': this.randNum});
+    this.room.sendTo(peers[0], revealMsg);
+  }
 
-    this.nonce++;
-    this.turnInfo += `${move}, nonce: ${this.nonce}, randNum: ${this.randNum}\n`;
-    this.changeDetection.detectChanges();
+  public sendHash(hash) {
+    const peers = this.room.getPeers();
+    this.room.sendTo(peers[0], hash);
+  }
+
+  public decryptOpponentMove(revealData) {
+    const moveHash = window.sessionStorage.getItem(`commit${this.nonce - 1}`);
+    const data = JSON.parse(moveHash);
+
+    const dataSig = ethers.utils.splitSignature(data.sig);
+
+    const msg = ethers.utils.solidityKeccak256(['string', 'int', 'int'], [revealData.move, this.nonce - 1, revealData.randNum]);
+    const hashData = ethers.utils.hashMessage(ethers.utils.arrayify(msg));
+
+    const recoveredAddress = ethers.utils.recoverAddress(hashData, dataSig);
+    console.log(recoveredAddress);
+
+    // TODO: check is the address the right one
+  }
+
+  public async defineWinner(revealData) {
+    if (this.lastMove === revealData.move) {
+      console.log('we both chose the same item');
+    } else if (this.lastMove === 'Rock') {
+      if (revealData.move === 'Paper') {
+        console.log('I lost');
+        this.lostGame();
+      } else if (revealData.move === 'Scissors') {
+        console.log('I Win');
+        this.winGame();
+      }
+    } else if (this.lastMove === 'Paper') {
+      if (revealData.move === 'Scissors') {
+        console.log('I lost');
+        this.lostGame();
+      } else if (revealData.move === 'Rock') {
+        console.log('I Win');
+        this.winGame();
+      }
+    } else if (this.lastMove === 'Scissors') {
+      if (revealData.move === 'Rock') {
+        console.log('I lost');
+        this.lostGame();
+      } else if (revealData.move === 'Paper') {
+        console.log('I Win');
+        this.winGame();
+      }
+    }
+  }
+
+  public winGame() {
+    this.myScore++;
+    this.opponentScore--;
+  }
+
+  public lostGame() {
+    this.myScore--;
+    this.opponentScore++;
+  }
+
+  public async signState() {
+    const hashMsg = ethers.utils.solidityKeccak256(['int', 'int', 'int'], [this.nonce - 1, this.myScore, this.opponentScore]);
+    const hashData = ethers.utils.arrayify(hashMsg);
+    const signature = await this.wallet.signMessage(hashData);
+
+    return JSON.stringify({'type': 'state', 'nonce': this.nonce - 1, 'myScore': this.myScore, 'opponentScore': this.opponentScore, 'sig': signature});
   }
 }
