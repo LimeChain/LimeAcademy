@@ -3,8 +3,6 @@ import * as ethers from 'ethers';
 import * as IPFS from 'ipfs';
 import * as Room from 'ipfs-pubsub-room';
 declare const Buffer;
-
-const ECTools = require('../contracts-json/ECTools.json');
 const RSP = require('../contracts-json/RSP.json');
 
 @Component({
@@ -15,8 +13,8 @@ const RSP = require('../contracts-json/RSP.json');
 export class AppComponent {
   public playerOne: any;
   public playerTwo: any;
-  public myScore = 5;
-  public opponentScore = 5;
+  public playerOneScore: any;
+  public playerTwoScore: any;
   public lastMove: string;
   public privateKey: string;
   public ethersDeposit: string;
@@ -29,6 +27,7 @@ export class AppComponent {
   public room: any;
   public nonce = 0;
   public randNum: number;
+  public winPrize = ethers.utils.bigNumberify('1000000000000000000');
   constructor(private changeDetection: ChangeDetectorRef) {
     // this.networkProvider = new ethers.providers.InfuraProvider('ropsten', 'jLCpladxNxIQQ2IbJ2Aw');
     this.networkProvider = new ethers.providers.JsonRpcProvider('http://localhost:8545');
@@ -69,26 +68,33 @@ export class AppComponent {
       const data = JSON.parse(message.data.toString());
       if (data.type === 'commit') {
         window.sessionStorage.setItem(data.type + data.nonce, message.data);
-
+        console.log(`commit received: ${message.data}`);
         const confirmHash = await this.signConfirmCommit(data.sig, data.nonce);
         await this.sendHash(confirmHash);
       } else if (data.type === 'confirmCommit') {
         window.sessionStorage.setItem(data.type + data.nonce, message.data);
+        console.log(`confirm commit received: ${message.data}`);
       } else if (data.type === 'reveal') {
         this.decryptOpponentMove(data);
         this.defineWinner(data);
         const stateHash = await this.signState();
         await this.sendHash(stateHash);
-        // window.sessionStorage.setItem('state' + (this.nonce - 1).toString(), stateHash);
+        console.log(`reveal received: ${message.data}`);
       } else if (data.type === 'state') {
-        console.log(data);
+        console.log(`state received: ${message.data}`);
+
+        const pl1 = ethers.utils.bigNumberify(data.playerOneScore);
+        const pl2 = ethers.utils.bigNumberify(data.playerTwoScore);
+
+        console.log(`${data.playerOneAddress} => ${pl1.toString()}`);
+        console.log(`${data.playerTwoAddress} => ${pl2.toString()}`);
+
         window.sessionStorage.setItem(data.type + data.nonce, data);
-      } else if (data.type === 'playerOne') {
-      console.log(data.address);
-      this.playerOne = data.address;
-    } else if (data.type === 'playerTwo') {
-        console.log(data.address);
+      } else if (data.type === 'player') {
         this.playerTwo = data.address;
+        this.playerTwoScore = data.playerScore;
+        console.log(`playerTwo: ${this.playerTwo}`);
+        console.log(`playerTwoScore: ${this.playerTwoScore}`);
       }
     });
 
@@ -182,12 +188,12 @@ export class AppComponent {
     const hashData = ethers.utils.hashMessage(ethers.utils.arrayify(msg));
 
     const recoveredAddress = ethers.utils.recoverAddress(hashData, dataSig);
-    console.log(recoveredAddress);
 
     // TODO: check is the address the right one
+    console.log('CHECK THIS: ' + recoveredAddress);
   }
 
-  public async defineWinner(revealData) {
+  public defineWinner(revealData) {
     if (this.lastMove === revealData.move) {
       console.log('we both chose the same item');
     } else if (this.lastMove === 'Rock') {
@@ -218,21 +224,27 @@ export class AppComponent {
   }
 
   public winGame() {
-    this.myScore++;
-    this.opponentScore--;
+    const plOneScoreBN = ethers.utils.bigNumberify(this.playerOneScore);
+    const plTwoScoreBN = ethers.utils.bigNumberify(this.playerTwoScore);
+
+    this.playerOneScore = plOneScoreBN.add(this.winPrize);
+    this.playerTwoScore = plTwoScoreBN.sub(this.winPrize);
   }
 
   public lostGame() {
-    this.myScore--;
-    this.opponentScore++;
+    const plOneScoreBN = ethers.utils.bigNumberify(this.playerOneScore);
+    const plTwoScoreBN = ethers.utils.bigNumberify(this.playerTwoScore);
+
+    this.playerOneScore = plOneScoreBN.sub(this.winPrize);
+    this.playerTwoScore = plTwoScoreBN.add(this.winPrize);
   }
 
   public async signState() {
-    const hashMsg = ethers.utils.solidityKeccak256(['int', 'int', 'int'], [this.nonce - 1, this.myScore, this.opponentScore]);
+    const hashMsg = ethers.utils.solidityKeccak256(['int', 'bytes', 'int', 'bytes', 'int'], [this.nonce - 1, this.playerOne, this.playerOneScore, this.playerTwo, this.playerTwoScore]);
     const hashData = ethers.utils.arrayify(hashMsg);
     const signature = await this.wallet.signMessage(hashData);
 
-    return JSON.stringify({'type': 'state', 'nonce': this.nonce - 1, 'myScore': this.myScore, 'opponentScore': this.opponentScore, 'sig': signature});
+    return JSON.stringify({'type': 'state', 'nonce': this.nonce - 1, 'playerOneAddress': this.playerOne, 'playerOneScore': this.playerOneScore, 'playerTwoAddress': this.playerTwo, 'playerTwoScore': this.playerTwoScore, 'sig': signature});
   }
 
   public async openChannel() {
@@ -244,11 +256,14 @@ export class AppComponent {
       value: wei
     });
 
+    this.playerOneScore = wei;
     this.playerOne = this.wallet.address;
-    console.log(this.playerOne);
 
-    const playerOne  = JSON.stringify({'type': `playerOne`, 'address': this.playerOne});
-    this.sendPlayer(playerOne);
+    console.log(`playerOne: ${this.playerOne}`);
+    console.log(`playerOneScore: ${this.playerOneScore}`);
+
+    const player  = JSON.stringify({'type': `player`, 'address': this.playerOne, 'playerScore': this.playerOneScore.toString()});
+    this.sendPlayer(player);
   }
 
   public async joinChannel() {
@@ -260,10 +275,14 @@ export class AppComponent {
       value: wei
     });
 
-    this.playerTwo = this.wallet.address;
+    this.playerOneScore = wei;
+    this.playerOne = this.wallet.address;
 
-    const playerTwo  = JSON.stringify({'type': `playerTwo`, 'address': this.playerTwo});
-    this.sendPlayer(playerTwo);
+    console.log(`playerOne: ${this.playerOne}`);
+    console.log(`playerOneScore: ${this.playerOneScore}`);
+
+    const player  = JSON.stringify({'type': `player`, 'address': this.playerOne, 'playerScore': this.playerOneScore.toString()});
+    this.sendPlayer(player);
   }
 
   public sendPlayer(playerAddress) {
