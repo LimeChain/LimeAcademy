@@ -314,6 +314,7 @@ export class AppComponent {
   public async claimPrize() {
     const rspInstance = new ethers.Contract(this.contractAddress, RSP.abi, this.networkProvider);
     const rspInstanceWithWallet = await rspInstance.connect(this.wallet);
+
     await rspInstanceWithWallet.payPrizes();
     console.log('Waiting to claim prize');
   }
