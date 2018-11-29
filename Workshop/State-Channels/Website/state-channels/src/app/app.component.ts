@@ -29,8 +29,8 @@ export class AppComponent {
   public randNum: number;
   public winPrize = ethers.utils.bigNumberify('1000000000000000000');
   constructor(private changeDetection: ChangeDetectorRef) {
-    // this.networkProvider = new ethers.providers.InfuraProvider('ropsten', 'jLCpladxNxIQQ2IbJ2Aw');
-    this.networkProvider = new ethers.providers.JsonRpcProvider('http://localhost:8545');
+    this.networkProvider = new ethers.providers.InfuraProvider('ropsten', 'jLCpladxNxIQQ2IbJ2Aw');
+    // this.networkProvider = new ethers.providers.JsonRpcProvider('http://localhost:8545');
     const ipfs = new IPFS({
       repo: repo(),
       EXPERIMENTAL: {
@@ -89,7 +89,7 @@ export class AppComponent {
         console.log(`${data.playerOneAddress} => ${pl1.toString()}`);
         console.log(`${data.playerTwoAddress} => ${pl2.toString()}`);
 
-        window.sessionStorage.setItem(data.type + data.nonce, data);
+        window.sessionStorage.setItem(data.type + data.nonce, message.data);
       } else if (data.type === 'player') {
         this.playerTwo = data.address;
         this.playerTwoScore = data.playerScore;
@@ -288,5 +288,33 @@ export class AppComponent {
   public sendPlayer(playerAddress) {
     const peers = this.room.getPeers();
     this.room.sendTo(peers[0], playerAddress);
+  }
+
+  public async closeChannel() {
+    const rspInstance = new ethers.Contract(this.contractAddress, RSP.abi, this.networkProvider);
+    const rspInstanceWithWallet = await rspInstance.connect(this.wallet);
+
+    const daForClosingChannel = window.sessionStorage.getItem(`state${(this.nonce - 1)}`);
+    const data = JSON.parse(daForClosingChannel.toString());
+
+    const plOneScoreBN = ethers.utils.bigNumberify(data.playerOneScore);
+    const plTwoScoreBN = ethers.utils.bigNumberify(data.playerTwoScore);
+
+    console.log(data.nonce);
+    console.log(data.playerOneAddress);
+    console.log(plOneScoreBN.toString());
+    console.log(data.playerTwoAddress);
+    console.log(plTwoScoreBN.toString());
+    console.log(data.sig);
+
+    await rspInstanceWithWallet.closeChannel(data.nonce, data.playerOneAddress, plOneScoreBN.toString(), data.playerTwoAddress, plTwoScoreBN.toString(), data.sig);
+    console.log('Closing channel initiated');
+  }
+
+  public async claimPrize() {
+    const rspInstance = new ethers.Contract(this.contractAddress, RSP.abi, this.networkProvider);
+    const rspInstanceWithWallet = await rspInstance.connect(this.wallet);
+    await rspInstanceWithWallet.payPrizes();
+    console.log('Waiting to claim prize');
   }
 }
