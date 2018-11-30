@@ -4,22 +4,24 @@
       <h1>State Channels</h1>
     </div>
   </div>
+  <hr>
   <div class="row">
     <div class="col-12 text-center state-col">
       <input type="password" [(ngModel)]="privateKey" placeholder="Your privateKey">
       <button class="btn btn-info" (click)="unlockWallet()">Unlock Wallet</button>
-      <button class="btn btn-info" (click)="revealLastMove()">Reveal Move</button>
+    </div>
+  </div>
+  <div class="row" id="walletBalance" *ngIf="balance">
+    <div class="col-12 text-center wallet-balance">
+      <p>{{ balance }}</p>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-12 text-center">
       <input type="text" [(ngModel)]="contractAddress" placeholder="Contract Address">
       <input type="text" [(ngModel)]="ethersDeposit" placeholder="Ethers Deposit">
       <button class="btn btn-info" (click)="openChannel()">Open Channel</button>
       <button class="btn btn-info" (click)="joinChannel()">Join Channel</button>
-      <button class="btn btn-info" (click)="closeChannel()">Close Channel</button>
-      <button class="btn btn-info" (click)="claimPrize()">Claim Prize</button>
-    </div>
-  </div>
-  <div class="row" id="walletBalance">
-    <div class="col-12 text-center">
-      <p>{{ balance }}</p>
     </div>
   </div>
   <div class="row">
@@ -30,6 +32,7 @@
   <div class="row">
     <div class="col-12 text-center state-col">
       <button class="btn btn-info" (click)="paper()">paper</button>
+      <button class="btn btn-info" (click)="revealLastMove()">Reveal Move</button>
     </div>
   </div>
   <div class="row">
@@ -37,6 +40,16 @@
       <button class="btn btn-info" (click)="scissors()">scissors</button>
     </div>
   </div>
+  <!-- <div class="row">
+   
+  </div> -->
+  <div class="row">
+    <div class="col-12 text-center state-col">
+      <button class="btn btn-info" (click)="closeChannel()">Close Channel</button>
+      <button class="btn btn-info" (click)="claimPrize()">Claim Prize</button>
+    </div>
+  </div>
+  <hr>
   <div class="row" id="info">
     <div class="col-12 text-center">
       <p>{{ stateText }}</p>
@@ -46,6 +59,11 @@
   <div class="row" id="turnInfo">
     <div class="col-12 text-center">
       <p>{{ turnInfo }}</p>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-12">
+      <p-messages [(value)]="msgs" closable="false"></p-messages>
     </div>
   </div>
   <br>

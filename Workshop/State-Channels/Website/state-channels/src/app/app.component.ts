@@ -1,4 +1,7 @@
-import { ChangeDetectorRef, Component } from '@angular/core';
+import { ChangeDetectorRef, Component, ViewEncapsulation } from '@angular/core';
+import { MessageService } from 'primeng/api';
+
+
 import * as ethers from 'ethers';
 import * as IPFS from 'ipfs';
 import * as Room from 'ipfs-pubsub-room';
@@ -8,7 +11,8 @@ const RSP = require('../contracts-json/RSP.json');
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
-  styleUrls: ['./app.component.scss']
+  styleUrls: ['./app.component.scss'],
+  encapsulation: ViewEncapsulation.None
 })
 export class AppComponent {
   public playerOne: any;
@@ -27,14 +31,19 @@ export class AppComponent {
   public room: any;
   public nonce = 0;
   public randNum: number;
-  public winPrize = ethers.utils.bigNumberify('1000000000000000000');
+  private DEFAULT_WIN_PRIZE = '1000000000000000000';
+  public winPrize = ethers.utils.bigNumberify(this.DEFAULT_WIN_PRIZE);
   public ipfs: IPFS;
-  constructor(private changeDetection: ChangeDetectorRef) {
+  private blockChainNetwork = 'http://localhost:8545';
+  public msgs = [];
+
+  constructor(private changeDetection: ChangeDetectorRef,
+    public messageService: MessageService) {
     // this.networkProvider = new ethers.providers.InfuraProvider('ropsten', 'jLCpladxNxIQQ2IbJ2Aw');
-    this.networkProvider = new ethers.providers.JsonRpcProvider('http://localhost:8545');
+    this.networkProvider = new ethers.providers.JsonRpcProvider(this.blockChainNetwork);
 
     this.ConnectToRoom();
-    this.listenForEvents().then( async () => {});
+    this.listenForEvents().then(async () => { });
   }
 
   public async unlockWallet() {
@@ -321,10 +330,13 @@ export class AppComponent {
   }
 
   public printMyData(data) {
-    console.log(data);
+    console.log('Print My Data', data);
+    this.messageService.add({ severity: 'success', summary: 'Service Message:', detail: data });
+    // this.addSingle(data);
   }
 
   public printAppInfo(data) {
-    console.log(data);
+    console.log('Print App Info', data);
+    this.messageService.add({ severity: 'info', summary: 'Info Message:', detail: data });
   }
 }
