@@ -1,0 +1,7 @@
+node_modules/
+.idea/
+.etherlime-store/
+.DS_Store
+config.json
+*.log
+build/
