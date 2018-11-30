@@ -1,4 +1,4 @@
-import {ChangeDetectorRef, Component} from '@angular/core';
+import { ChangeDetectorRef, Component } from '@angular/core';
 import * as ethers from 'ethers';
 import * as IPFS from 'ipfs';
 import * as Room from 'ipfs-pubsub-room';
@@ -28,31 +28,15 @@ export class AppComponent {
   public nonce = 0;
   public randNum: number;
   public winPrize = ethers.utils.bigNumberify('1000000000000000000');
+  public ipfs: IPFS;
   constructor(private changeDetection: ChangeDetectorRef) {
     this.networkProvider = new ethers.providers.InfuraProvider('ropsten', 'jLCpladxNxIQQ2IbJ2Aw');
     // this.networkProvider = new ethers.providers.JsonRpcProvider('http://localhost:8545');
-    const ipfs = new IPFS({
-      repo: repo(),
-      EXPERIMENTAL: {
-        pubsub: true
-      },
-      config: {
-        Addresses: {
-          Swarm: [
-            '/dnsaddr/ws-star.discovery.libp2p.io/tcp/443/wss/p2p-websocket-star'
-            // '/dns4/ws-star.discovery.libp2p.io/tcp/443/wss/p2p-websocket-star/'
-          ]
-        }
-      }
 
-    });
+    this.test();
 
-    ipfs.once('ready', () => ipfs.id((err, info) => {
-      if (err) {throw err;}
-      console.log('IPFS node ready with address ' + info.id);
-    }));
 
-    this.room = Room(ipfs, 'stateChannelDemo');
+    this.room = Room(this.ipfs, 'stateChannelDemo');
 
     this.room.on('peer joined', (peer) => {
       console.log(`${peer} joined`);
@@ -98,9 +82,7 @@ export class AppComponent {
       }
     });
 
-    function repo() {
-      return 'ipfs/pubsub-demo/' + Math.random();
-    }
+
   }
 
   public async unlockWallet() {
@@ -115,7 +97,7 @@ export class AppComponent {
     const moveHash = await this.signMove(this.lastMove);
     await this.sendHash(moveHash);
 
-    const myTurn  = JSON.stringify({'type': `myTurn`, 'move': this.lastMove, 'randNum': this.randNum, 'nonce': this.nonce});
+    const myTurn = JSON.stringify({ 'type': `myTurn`, 'move': this.lastMove, 'randNum': this.randNum, 'nonce': this.nonce });
     window.sessionStorage.setItem('myTurn' + this.nonce.toString(), myTurn);
 
     this.turnInfo += `move: ${this.lastMove}, nonce: ${this.nonce}, randNum: ${this.randNum}`;
@@ -128,7 +110,7 @@ export class AppComponent {
     const moveHash = await this.signMove(this.lastMove);
     await this.sendHash(moveHash);
 
-    const myTurn  = JSON.stringify({'type': `myTurn`, 'move': this.lastMove, 'randNum': this.randNum, 'nonce': this.nonce});
+    const myTurn = JSON.stringify({ 'type': `myTurn`, 'move': this.lastMove, 'randNum': this.randNum, 'nonce': this.nonce });
     window.sessionStorage.setItem('myTurn' + this.nonce.toString(), myTurn);
 
     this.turnInfo += `move: ${this.lastMove}, nonce: ${this.nonce}, randNum: ${this.randNum}`;
@@ -141,7 +123,7 @@ export class AppComponent {
     const moveHash = await this.signMove(this.lastMove);
     await this.sendHash(moveHash);
 
-    const myTurn  = JSON.stringify({'type': `myTurn`, 'move': this.lastMove, 'randNum': this.randNum, 'nonce': this.nonce});
+    const myTurn = JSON.stringify({ 'type': `myTurn`, 'move': this.lastMove, 'randNum': this.randNum, 'nonce': this.nonce });
     window.sessionStorage.setItem('myTurn' + this.nonce.toString(), myTurn);
 
     this.turnInfo += `move: ${this.lastMove}, nonce: ${this.nonce}, randNum: ${this.randNum}`;
@@ -156,7 +138,7 @@ export class AppComponent {
     const hashData = ethers.utils.arrayify(hashMsg);
     const signature = await this.wallet.signMessage(hashData);
 
-    return JSON.stringify({'type': 'commit', 'nonce': this.nonce, 'sig': signature});
+    return JSON.stringify({ 'type': 'commit', 'nonce': this.nonce, 'sig': signature });
   }
 
   public async signConfirmCommit(commit, nonce) {
@@ -164,12 +146,12 @@ export class AppComponent {
     const hashData = ethers.utils.arrayify(hashMsg);
     const signature = await this.wallet.signMessage(hashData);
 
-    return JSON.stringify({'type': 'confirmCommit', 'nonce': nonce, 'sig': signature});
+    return JSON.stringify({ 'type': 'confirmCommit', 'nonce': nonce, 'sig': signature });
   }
 
   public revealLastMove() {
     const peers = this.room.getPeers();
-    const revealMsg = JSON.stringify({'type': 'reveal', 'move': this.lastMove, 'randNum': this.randNum});
+    const revealMsg = JSON.stringify({ 'type': 'reveal', 'move': this.lastMove, 'randNum': this.randNum });
     this.room.sendTo(peers[0], revealMsg);
   }
 
@@ -244,7 +226,7 @@ export class AppComponent {
     const hashData = ethers.utils.arrayify(hashMsg);
     const signature = await this.wallet.signMessage(hashData);
 
-    return JSON.stringify({'type': 'state', 'nonce': this.nonce - 1, 'playerOneAddress': this.playerOne, 'playerOneScore': this.playerOneScore, 'playerTwoAddress': this.playerTwo, 'playerTwoScore': this.playerTwoScore, 'sig': signature});
+    return JSON.stringify({ 'type': 'state', 'nonce': this.nonce - 1, 'playerOneAddress': this.playerOne, 'playerOneScore': this.playerOneScore, 'playerTwoAddress': this.playerTwo, 'playerTwoScore': this.playerTwoScore, 'sig': signature });
   }
 
   public async openChannel() {
@@ -262,7 +244,7 @@ export class AppComponent {
     console.log(`playerOne: ${this.playerOne}`);
     console.log(`playerOneScore: ${this.playerOneScore}`);
 
-    const player  = JSON.stringify({'type': `player`, 'address': this.playerOne, 'playerScore': this.playerOneScore.toString()});
+    const player = JSON.stringify({ 'type': `player`, 'address': this.playerOne, 'playerScore': this.playerOneScore.toString() });
     this.sendPlayer(player);
   }
 
@@ -281,7 +263,7 @@ export class AppComponent {
     console.log(`playerOne: ${this.playerOne}`);
     console.log(`playerOneScore: ${this.playerOneScore}`);
 
-    const player  = JSON.stringify({'type': `player`, 'address': this.playerOne, 'playerScore': this.playerOneScore.toString()});
+    const player = JSON.stringify({ 'type': `player`, 'address': this.playerOne, 'playerScore': this.playerOneScore.toString() });
     this.sendPlayer(player);
   }
 
@@ -317,5 +299,32 @@ export class AppComponent {
 
     await rspInstanceWithWallet.payPrizes();
     console.log('Waiting to claim prize');
+  }
+
+  private test() {
+    this.ipfs = new IPFS({
+      repo: repo(),
+      EXPERIMENTAL: {
+        pubsub: true
+      },
+      config: {
+        Addresses: {
+          Swarm: [
+            '/dnsaddr/ws-star.discovery.libp2p.io/tcp/443/wss/p2p-websocket-star'
+            // '/dns4/ws-star.discovery.libp2p.io/tcp/443/wss/p2p-websocket-star/'
+          ]
+        }
+      }
+
+    });
+
+    this.ipfs.once('ready', () => this.ipfs.id((err, info) => {
+      if (err) { throw err; }
+      console.log('IPFS node ready with address ' + info.id);
+    }));
+
+    function repo() {
+      return 'ipfs/pubsub-demo/' + Math.random();
+    }
   }
 }
