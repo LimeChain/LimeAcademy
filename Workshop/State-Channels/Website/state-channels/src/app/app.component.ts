@@ -37,11 +37,83 @@ export class AppComponent {
     this.listenForEvents().then( async () => {});
   }
 
+  private ConnectToRoom() {
+    this.ipfs = new IPFS({
+      repo: repo(),
+      EXPERIMENTAL: {
+        pubsub: true
+      },
+      config: {
+        Addresses: {
+          Swarm: [
+            '/dnsaddr/ws-star.discovery.libp2p.io/tcp/443/wss/p2p-websocket-star'
+            // '/dns4/ws-star.discovery.libp2p.io/tcp/443/wss/p2p-websocket-star/'
+          ]
+        }
+      }
+
+    });
+
+    this.ipfs.once('ready', () => this.ipfs.id((err, info) => {
+      if (err) { throw err; }
+      this.printAppInfo(`IPFS node ready with address ${info.id}`);
+    }));
+
+    function repo() {
+      return 'ipfs/pubsub-demo/' + Math.random();
+    }
+
+    this.room = Room(this.ipfs, 'stateChannelDemo');
+  }
+
   public async unlockWallet() {
     this.wallet = new ethers.Wallet(this.privateKey, this.networkProvider);
     const walletBalance = await this.networkProvider.getBalance(this.wallet.address);
     this.balance = `Address: ${this.wallet.address}\nBalance: ${ethers.utils.formatEther(walletBalance)}`;
     this.changeDetection.detectChanges();
+  }
+
+  public async openChannel() {
+    const wei = ethers.utils.parseEther(this.ethersDeposit);
+    const rspInstance = new ethers.Contract(this.contractAddress, RSP.abi, this.networkProvider);
+
+    const rspInstanceForPlOne = await rspInstance.connect(this.wallet);
+    await rspInstanceForPlOne.openChannel({
+      value: wei
+    });
+
+    this.playerOneScore = wei;
+    this.playerOne = this.wallet.address;
+
+    this.printMyData(`playerOne: ${this.playerOne}`);
+    this.printMyData(`playerOneScore: ${this.playerOneScore}`);
+
+    const player = JSON.stringify({ 'type': `player`, 'address': this.playerOne, 'playerScore': this.playerOneScore.toString() });
+    this.sendPlayer(player);
+  }
+
+  public async joinChannel() {
+    const wei = ethers.utils.parseEther(this.ethersDeposit);
+    const rspInstance = new ethers.Contract(this.contractAddress, RSP.abi, this.networkProvider);
+
+    const rspInstanceForPlTwo = await rspInstance.connect(this.wallet);
+    await rspInstanceForPlTwo.joinChannel({
+      value: wei
+    });
+
+    this.playerOneScore = wei;
+    this.playerOne = this.wallet.address;
+
+    this.printMyData(`playerOne: ${this.playerOne}`);
+    this.printMyData(`playerOneScore: ${this.playerOneScore}`);
+
+    const player = JSON.stringify({ 'type': `player`, 'address': this.playerOne, 'playerScore': this.playerOneScore.toString() });
+    this.sendPlayer(player);
+  }
+
+  public sendPlayer(playerAddress) {
+    const peers = this.room.getPeers();
+    this.room.sendTo(peers[0], playerAddress);
   }
 
   public async rock() {
@@ -83,6 +155,12 @@ export class AppComponent {
     this.nonce++;
   }
 
+  public revealLastMove() {
+    const peers = this.room.getPeers();
+    const revealMsg = JSON.stringify({ 'type': 'reveal', 'move': this.lastMove, 'randNum': this.randNum });
+    this.room.sendTo(peers[0], revealMsg);
+  }
+
   public async signMove(move) {
     this.randNum = Math.floor(Math.random() * (1000 - 1) + 1);
 
@@ -101,10 +179,12 @@ export class AppComponent {
     return JSON.stringify({ 'type': 'confirmCommit', 'nonce': nonce, 'sig': signature });
   }
 
-  public revealLastMove() {
-    const peers = this.room.getPeers();
-    const revealMsg = JSON.stringify({ 'type': 'reveal', 'move': this.lastMove, 'randNum': this.randNum });
-    this.room.sendTo(peers[0], revealMsg);
+  public async signState() {
+    const hashMsg = ethers.utils.solidityKeccak256(['int', 'bytes', 'int', 'bytes', 'int'], [this.nonce - 1, this.playerOne, this.playerOneScore, this.playerTwo, this.playerTwoScore]);
+    const hashData = ethers.utils.arrayify(hashMsg);
+    const signature = await this.wallet.signMessage(hashData);
+
+    return JSON.stringify({ 'type': 'state', 'nonce': this.nonce - 1, 'playerOneAddress': this.playerOne, 'playerOneScore': this.playerOneScore, 'playerTwoAddress': this.playerTwo, 'playerTwoScore': this.playerTwoScore, 'sig': signature });
   }
 
   public sendHash(hash) {
@@ -112,18 +192,50 @@ export class AppComponent {
     this.room.sendTo(peers[0], hash);
   }
 
-  public decryptOpponentMove(revealData) {
-    const moveHash = window.sessionStorage.getItem(`commit${this.nonce - 1}`);
-    const data = JSON.parse(moveHash);
+  private async listenForEvents() {
+    this.room.on('peer joined', (peer) => {
+      this.printAppInfo(`${peer} joined`);
+      // this.stateText = `${peer} joined`;
+      this.changeDetection.detectChanges();
+    });
+    this.room.on('peer left', (peer) => {
+      // this.stateText = `${peer} left`;
+      this.printAppInfo(`${peer} left`);
+      this.changeDetection.detectChanges();
+    });
+    this.room.on('message', async (message) => {
+      const data = JSON.parse(message.data.toString());
+      if (data.type === 'commit') {
+        window.sessionStorage.setItem(data.type + data.nonce, message.data);
+        this.printMyData(`commit received: ${message.data}`);
+        const confirmHash = await this.signConfirmCommit(data.sig, data.nonce);
+        await this.sendHash(confirmHash);
+      } else if (data.type === 'confirmCommit') {
+        window.sessionStorage.setItem(data.type + data.nonce, message.data);
+        this.printMyData(`confirm commit received: ${message.data}`);
+      } else if (data.type === 'reveal') {
+        this.decryptOpponentMove(data);
+        this.defineWinner(data);
+        const stateHash = await this.signState();
+        await this.sendHash(stateHash);
+        this.printMyData(`reveal received: ${message.data}`);
+      } else if (data.type === 'state') {
+        this.printMyData(`state received: ${message.data}`);
 
-    const dataSig = ethers.utils.splitSignature(data.sig);
+        const pl1 = ethers.utils.bigNumberify(data.playerOneScore);
+        const pl2 = ethers.utils.bigNumberify(data.playerTwoScore);
 
-    const msg = ethers.utils.solidityKeccak256(['string', 'int', 'int'], [revealData.move, this.nonce - 1, revealData.randNum]);
-    const hashData = ethers.utils.hashMessage(ethers.utils.arrayify(msg));
+        this.printMyData(`${data.playerOneAddress} => ${pl1.toString()}`);
+        this.printMyData(`${data.playerTwoAddress} => ${pl2.toString()}`);
 
-    const recoveredAddress = ethers.utils.recoverAddress(hashData, dataSig);
-
-    // TODO: check if the recovered address the right one
+        window.sessionStorage.setItem(data.type + data.nonce, message.data);
+      } else if (data.type === 'player') {
+        this.playerTwo = data.address;
+        this.playerTwoScore = data.playerScore;
+        this.printMyData(`playerTwo: ${this.playerTwo}`);
+        this.printMyData(`playerTwoScore: ${this.playerTwoScore}`);
+      }
+    });
   }
 
   public defineWinner(revealData) {
@@ -172,55 +284,18 @@ export class AppComponent {
     this.playerTwoScore = plTwoScoreBN.add(this.winPrize);
   }
 
-  public async signState() {
-    const hashMsg = ethers.utils.solidityKeccak256(['int', 'bytes', 'int', 'bytes', 'int'], [this.nonce - 1, this.playerOne, this.playerOneScore, this.playerTwo, this.playerTwoScore]);
-    const hashData = ethers.utils.arrayify(hashMsg);
-    const signature = await this.wallet.signMessage(hashData);
+  public decryptOpponentMove(revealData) {
+    const moveHash = window.sessionStorage.getItem(`commit${this.nonce - 1}`);
+    const data = JSON.parse(moveHash);
 
-    return JSON.stringify({ 'type': 'state', 'nonce': this.nonce - 1, 'playerOneAddress': this.playerOne, 'playerOneScore': this.playerOneScore, 'playerTwoAddress': this.playerTwo, 'playerTwoScore': this.playerTwoScore, 'sig': signature });
-  }
+    const dataSig = ethers.utils.splitSignature(data.sig);
 
-  public async openChannel() {
-    const wei = ethers.utils.parseEther(this.ethersDeposit);
-    const rspInstance = new ethers.Contract(this.contractAddress, RSP.abi, this.networkProvider);
+    const msg = ethers.utils.solidityKeccak256(['string', 'int', 'int'], [revealData.move, this.nonce - 1, revealData.randNum]);
+    const hashData = ethers.utils.hashMessage(ethers.utils.arrayify(msg));
 
-    const rspInstanceForPlOne = await rspInstance.connect(this.wallet);
-    await rspInstanceForPlOne.openChannel({
-      value: wei
-    });
-
-    this.playerOneScore = wei;
-    this.playerOne = this.wallet.address;
-
-    this.printMyData(`playerOne: ${this.playerOne}`);
-    this.printMyData(`playerOneScore: ${this.playerOneScore}`);
-
-    const player = JSON.stringify({ 'type': `player`, 'address': this.playerOne, 'playerScore': this.playerOneScore.toString() });
-    this.sendPlayer(player);
-  }
-
-  public async joinChannel() {
-    const wei = ethers.utils.parseEther(this.ethersDeposit);
-    const rspInstance = new ethers.Contract(this.contractAddress, RSP.abi, this.networkProvider);
-
-    const rspInstanceForPlTwo = await rspInstance.connect(this.wallet);
-    await rspInstanceForPlTwo.joinChannel({
-      value: wei
-    });
-
-    this.playerOneScore = wei;
-    this.playerOne = this.wallet.address;
-
-    this.printMyData(`playerOne: ${this.playerOne}`);
-    this.printMyData(`playerOneScore: ${this.playerOneScore}`);
-
-    const player = JSON.stringify({ 'type': `player`, 'address': this.playerOne, 'playerScore': this.playerOneScore.toString() });
-    this.sendPlayer(player);
-  }
-
-  public sendPlayer(playerAddress) {
-    const peers = this.room.getPeers();
-    this.room.sendTo(peers[0], playerAddress);
+    const recoveredAddress = ethers.utils.recoverAddress(hashData, dataSig);
+    this.printMyData(`This is the recover(opponent) address: ${recoveredAddress}`)
+    // TODO: check if the recovered address the right one
   }
 
   public async closeChannel() {
@@ -243,81 +318,6 @@ export class AppComponent {
 
     await rspInstanceWithWallet.payPrizes({gasLimit: 4000000});
     this.printMyData('Waiting to claim prize');
-  }
-
-  private ConnectToRoom() {
-    this.ipfs = new IPFS({
-      repo: repo(),
-      EXPERIMENTAL: {
-        pubsub: true
-      },
-      config: {
-        Addresses: {
-          Swarm: [
-            '/dnsaddr/ws-star.discovery.libp2p.io/tcp/443/wss/p2p-websocket-star'
-            // '/dns4/ws-star.discovery.libp2p.io/tcp/443/wss/p2p-websocket-star/'
-          ]
-        }
-      }
-
-    });
-
-    this.ipfs.once('ready', () => this.ipfs.id((err, info) => {
-      if (err) { throw err; }
-      this.printAppInfo(`IPFS node ready with address ${info.id}`);
-    }));
-
-    function repo() {
-      return 'ipfs/pubsub-demo/' + Math.random();
-    }
-
-    this.room = Room(this.ipfs, 'stateChannelDemo');
-  }
-
-  private async listenForEvents() {
-    this.room.on('peer joined', (peer) => {
-      this.printAppInfo(`${peer} joined`);
-      // this.stateText = `${peer} joined`;
-      this.changeDetection.detectChanges();
-    });
-    this.room.on('peer left', (peer) => {
-      // this.stateText = `${peer} left`;
-      this.printAppInfo(`${peer} left`);
-      this.changeDetection.detectChanges();
-    });
-    this.room.on('message', async (message) => {
-      const data = JSON.parse(message.data.toString());
-      if (data.type === 'commit') {
-        window.sessionStorage.setItem(data.type + data.nonce, message.data);
-        this.printMyData(`commit received: ${message.data}`);
-        const confirmHash = await this.signConfirmCommit(data.sig, data.nonce);
-        await this.sendHash(confirmHash);
-      } else if (data.type === 'confirmCommit') {
-        window.sessionStorage.setItem(data.type + data.nonce, message.data);
-        this.printMyData(`confirm commit received: ${message.data}`);
-      } else if (data.type === 'reveal') {
-        this.decryptOpponentMove(data);
-        this.defineWinner(data);
-        const stateHash = await this.signState();
-        await this.sendHash(stateHash);
-        this.printMyData(`reveal received: ${message.data}`);
-      } else if (data.type === 'state') {
-        this.printMyData(`state received: ${message.data}`);
-
-        const pl1 = ethers.utils.bigNumberify(data.playerOneScore);
-        const pl2 = ethers.utils.bigNumberify(data.playerTwoScore);
-
-        this.printMyData(`${data.playerOneAddress} => ${pl1.toString()}`);
-        this.printMyData(`${data.playerTwoAddress} => ${pl2.toString()}`);
-
-        window.sessionStorage.setItem(data.type + data.nonce, message.data);
-      } else if (data.type === 'player') {
-        this.playerTwo = data.address;
-        this.playerTwoScore = data.playerScore;
-        this.printMyData(`playerTwo: ${this.playerTwo}`);
-        this.printMyData(`playerTwoScore: ${this.playerTwoScore}`);
-      }
-    });
   }
 
   public printMyData(data) {
