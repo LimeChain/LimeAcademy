@@ -37,6 +37,7 @@ export class AppComponent {
   private blockChainNetwork = 'http://localhost:8545';
   public infoMessages = [];
   public systemMessages = [];
+  public userAction = [];
 
 
   constructor(private changeDetection: ChangeDetectorRef,
@@ -347,7 +348,7 @@ export class AppComponent {
 
   public printUserAction(data) {
     console.log('Print App Info', data);
-    this.systemMessages.push({ severity: 'info', summary: 'Info Message', detail: data });
+    this.userAction.push({ severity: 'warn', summary: 'User Action', detail: data });
     this.changeDetection.detectChanges();
 
   }
