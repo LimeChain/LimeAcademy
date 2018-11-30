@@ -300,20 +300,20 @@ export class AppComponent {
       const data = JSON.parse(message.data.toString());
       if (data.type === 'commit') {
         window.sessionStorage.setItem(data.type + data.nonce, message.data);
-        this.printMyData(`commit received: ${message.data}`);
+        this.printUserAction(`commit received: ${message.data}`);
         const confirmHash = await this.signConfirmCommit(data.sig, data.nonce);
         await this.sendHash(confirmHash);
       } else if (data.type === 'confirmCommit') {
         window.sessionStorage.setItem(data.type + data.nonce, message.data);
-        this.printMyData(`confirm commit received: ${message.data}`);
+        this.printUserAction(`confirm commit received: ${message.data}`);
       } else if (data.type === 'reveal') {
         this.decryptOpponentMove(data);
         this.defineWinner(data);
         const stateHash = await this.signState();
         await this.sendHash(stateHash);
-        this.printMyData(`reveal received: ${message.data}`);
+        this.printUserAction(`reveal received: ${message.data}`);
       } else if (data.type === 'state') {
-        this.printMyData(`state received: ${message.data}`);
+        this.printUserAction(`state received: ${message.data}`);
 
         const pl1 = ethers.utils.bigNumberify(data.playerOneScore);
         const pl2 = ethers.utils.bigNumberify(data.playerTwoScore);
@@ -339,6 +339,13 @@ export class AppComponent {
   }
 
   public printAppInfo(data) {
+    console.log('Print App Info', data);
+    this.systemMessages.push({ severity: 'info', summary: 'Info Message', detail: data });
+    this.changeDetection.detectChanges();
+
+  }
+
+  public printUserAction(data) {
     console.log('Print App Info', data);
     this.systemMessages.push({ severity: 'info', summary: 'Info Message', detail: data });
     this.changeDetection.detectChanges();
