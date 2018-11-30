@@ -246,7 +246,7 @@ export class AppComponent {
     const plTwoScoreBN = ethers.utils.bigNumberify(data.playerTwoScore);
 
     await rspInstanceWithWallet.closeChannel(data.nonce, data.playerOneAddress, plOneScoreBN.toString(), data.playerTwoAddress, plTwoScoreBN.toString(), data.sig);
-    this.printMyData(`Closing channel with the following arguments: nonce: ${data.nonce}, plOneAddr: ${data.playerOneAddress}, plOneScore: ${data.playerOneScore.toString()}, plTwoScore: ${data.playerTwoScore.toString()}, sig: ${data.sig}`);
+    this.printMyData(`Closing channel with the following arguments: nonce: ${data.nonce}, plOneAddr: ${data.playerOneAddress}, plOneScore: ${plOneScoreBN.toString()}, plTwoScore: ${plTwoScoreBN.toString()}, sig: ${data.sig}`);
   }
 
   public async claimPrize() {
@@ -301,20 +301,22 @@ export class AppComponent {
       const data = JSON.parse(message.data.toString());
       if (data.type === 'commit') {
         window.sessionStorage.setItem(data.type + data.nonce, message.data);
-        this.printUserAction(`commit received: ${message.data}`);
+        this.printUserAction(`commit received: nonce: ${data.nonce}, sig: ${data.sig}`);
         const confirmHash = await this.signConfirmCommit(data.sig, data.nonce);
         await this.sendHash(confirmHash);
       } else if (data.type === 'confirmCommit') {
         window.sessionStorage.setItem(data.type + data.nonce, message.data);
-        this.printUserAction(`confirm commit received: ${message.data}`);
+        this.printUserAction(`confirm commit received: nonce: ${data.nonce}, sig: ${data.sig}`);
       } else if (data.type === 'reveal') {
         this.decryptOpponentMove(data);
         this.defineWinner(data);
         const stateHash = await this.signState();
         await this.sendHash(stateHash);
-        this.printUserAction(`reveal received: ${message.data}`);
+        this.printUserAction(`reveal received: nonce: ${data.nonce}, move: ${data.move}, randNum: ${data.randNum}`);
       } else if (data.type === 'state') {
-        this.printUserAction(`state received: ${message.data}`);
+        const plOneScoreBN = ethers.utils.bigNumberify(data.playerOneScore);
+        const plTwoScoreBN = ethers.utils.bigNumberify(data.playerTwoScore);
+        this.printUserAction(`state received: nonce: ${data.nonce}, plOneAddr: ${data.playerOneAddress}, plOneScore: ${plOneScoreBN.toString()}, plTwoAddr: ${data.playerTwoAddress}, plTwoScore: ${plTwoScoreBN}, sig: ${data.sig}`);
 
         const pl1 = ethers.utils.bigNumberify(data.playerOneScore);
         const pl2 = ethers.utils.bigNumberify(data.playerTwoScore);
