@@ -24,6 +24,7 @@
       <button class="btn btn-info" (click)="joinChannel()">Join Channel</button>
     </div>
   </div>
+  <hr>
   <div class="row">
     <div class="col-12 text-center state-col">
       <button class="btn btn-info" (click)="rock()">rock</button>
@@ -40,9 +41,7 @@
       <button class="btn btn-info" (click)="scissors()">scissors</button>
     </div>
   </div>
-  <!-- <div class="row">
-   
-  </div> -->
+  <hr>
   <div class="row">
     <div class="col-12 text-center state-col">
       <button class="btn btn-info" (click)="closeChannel()">Close Channel</button>
@@ -50,26 +49,15 @@
     </div>
   </div>
   <hr>
-  <div class="row" id="info">
-    <div class="col-12 text-center">
-      <p>{{ stateText }}</p>
-    </div>
-  </div>
-  <br>
-  <div class="row" id="turnInfo">
-    <div class="col-12 text-center">
-      <p>{{ turnInfo }}</p>
-    </div>
-  </div>
   <div class="row">
+    <div class="col-12">
+      <p-messages [(value)]="userAction" closable="false"></p-messages>
+    </div>
     <div class="col-12">
       <p-messages [(value)]="infoMessages" closable="false"></p-messages>
     </div>
     <div class="col-12">
       <p-messages [(value)]="systemMessages" closable="false"></p-messages>
-    </div>
-    <div class="col-12">
-      <p-messages [(value)]="userAction" closable="false"></p-messages>
     </div>
   </div>
   <br>
