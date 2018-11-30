@@ -30,59 +30,11 @@ export class AppComponent {
   public winPrize = ethers.utils.bigNumberify('1000000000000000000');
   public ipfs: IPFS;
   constructor(private changeDetection: ChangeDetectorRef) {
-    this.networkProvider = new ethers.providers.InfuraProvider('ropsten', 'jLCpladxNxIQQ2IbJ2Aw');
-    // this.networkProvider = new ethers.providers.JsonRpcProvider('http://localhost:8545');
+    // this.networkProvider = new ethers.providers.InfuraProvider('ropsten', 'jLCpladxNxIQQ2IbJ2Aw');
+    this.networkProvider = new ethers.providers.JsonRpcProvider('http://localhost:8545');
 
-    this.test();
-
-
-    this.room = Room(this.ipfs, 'stateChannelDemo');
-
-    this.room.on('peer joined', (peer) => {
-      console.log(`${peer} joined`);
-      this.stateText = `${peer} joined`;
-      this.changeDetection.detectChanges();
-    });
-    this.room.on('peer left', (peer) => {
-      this.stateText = `${peer} left`;
-      console.log(`${peer} left`);
-      this.changeDetection.detectChanges();
-    });
-    this.room.on('message', async (message) => {
-      const data = JSON.parse(message.data.toString());
-      if (data.type === 'commit') {
-        window.sessionStorage.setItem(data.type + data.nonce, message.data);
-        console.log(`commit received: ${message.data}`);
-        const confirmHash = await this.signConfirmCommit(data.sig, data.nonce);
-        await this.sendHash(confirmHash);
-      } else if (data.type === 'confirmCommit') {
-        window.sessionStorage.setItem(data.type + data.nonce, message.data);
-        console.log(`confirm commit received: ${message.data}`);
-      } else if (data.type === 'reveal') {
-        this.decryptOpponentMove(data);
-        this.defineWinner(data);
-        const stateHash = await this.signState();
-        await this.sendHash(stateHash);
-        console.log(`reveal received: ${message.data}`);
-      } else if (data.type === 'state') {
-        console.log(`state received: ${message.data}`);
-
-        const pl1 = ethers.utils.bigNumberify(data.playerOneScore);
-        const pl2 = ethers.utils.bigNumberify(data.playerTwoScore);
-
-        console.log(`${data.playerOneAddress} => ${pl1.toString()}`);
-        console.log(`${data.playerTwoAddress} => ${pl2.toString()}`);
-
-        window.sessionStorage.setItem(data.type + data.nonce, message.data);
-      } else if (data.type === 'player') {
-        this.playerTwo = data.address;
-        this.playerTwoScore = data.playerScore;
-        console.log(`playerTwo: ${this.playerTwo}`);
-        console.log(`playerTwoScore: ${this.playerTwoScore}`);
-      }
-    });
-
-
+    this.ConnectToRoom();
+    this.listenForEvents().then( async () => {});
   }
 
   public async unlockWallet() {
@@ -171,35 +123,34 @@ export class AppComponent {
 
     const recoveredAddress = ethers.utils.recoverAddress(hashData, dataSig);
 
-    // TODO: check is the address the right one
-    console.log('CHECK THIS: ' + recoveredAddress);
+    // TODO: check if the recovered address the right one
   }
 
   public defineWinner(revealData) {
     if (this.lastMove === revealData.move) {
-      console.log('we both chose the same item');
+      this.printMyData('we both chose the same item');
     } else if (this.lastMove === 'Rock') {
       if (revealData.move === 'Paper') {
-        console.log('I lost');
+        this.printMyData('I lost');
         this.lostGame();
       } else if (revealData.move === 'Scissors') {
-        console.log('I Win');
+        this.printMyData('I Win');
         this.winGame();
       }
     } else if (this.lastMove === 'Paper') {
       if (revealData.move === 'Scissors') {
-        console.log('I lost');
+        this.printMyData('I lost');
         this.lostGame();
       } else if (revealData.move === 'Rock') {
-        console.log('I Win');
+        this.printMyData('I Win');
         this.winGame();
       }
     } else if (this.lastMove === 'Scissors') {
       if (revealData.move === 'Rock') {
-        console.log('I lost');
+        this.printMyData('I lost');
         this.lostGame();
       } else if (revealData.move === 'Paper') {
-        console.log('I Win');
+        this.printMyData('I Win');
         this.winGame();
       }
     }
@@ -241,8 +192,8 @@ export class AppComponent {
     this.playerOneScore = wei;
     this.playerOne = this.wallet.address;
 
-    console.log(`playerOne: ${this.playerOne}`);
-    console.log(`playerOneScore: ${this.playerOneScore}`);
+    this.printMyData(`playerOne: ${this.playerOne}`);
+    this.printMyData(`playerOneScore: ${this.playerOneScore}`);
 
     const player = JSON.stringify({ 'type': `player`, 'address': this.playerOne, 'playerScore': this.playerOneScore.toString() });
     this.sendPlayer(player);
@@ -260,8 +211,8 @@ export class AppComponent {
     this.playerOneScore = wei;
     this.playerOne = this.wallet.address;
 
-    console.log(`playerOne: ${this.playerOne}`);
-    console.log(`playerOneScore: ${this.playerOneScore}`);
+    this.printMyData(`playerOne: ${this.playerOne}`);
+    this.printMyData(`playerOneScore: ${this.playerOneScore}`);
 
     const player = JSON.stringify({ 'type': `player`, 'address': this.playerOne, 'playerScore': this.playerOneScore.toString() });
     this.sendPlayer(player);
@@ -282,15 +233,8 @@ export class AppComponent {
     const plOneScoreBN = ethers.utils.bigNumberify(data.playerOneScore);
     const plTwoScoreBN = ethers.utils.bigNumberify(data.playerTwoScore);
 
-    console.log(data.nonce);
-    console.log(data.playerOneAddress);
-    console.log(plOneScoreBN.toString());
-    console.log(data.playerTwoAddress);
-    console.log(plTwoScoreBN.toString());
-    console.log(data.sig);
-
     await rspInstanceWithWallet.closeChannel(data.nonce, data.playerOneAddress, plOneScoreBN.toString(), data.playerTwoAddress, plTwoScoreBN.toString(), data.sig);
-    console.log('Closing channel initiated');
+    this.printMyData(`Closing channel with the following arguments: nonce: ${data.nonce}, plOneAddr: ${data.playerOneAddress}, plOneScore: ${data.playerOneScore.toString()}, plTwoScore: ${data.playerTwoScore.toString()}, sig: ${data.sig}`);
   }
 
   public async claimPrize() {
@@ -298,10 +242,10 @@ export class AppComponent {
     const rspInstanceWithWallet = await rspInstance.connect(this.wallet);
 
     await rspInstanceWithWallet.payPrizes();
-    console.log('Waiting to claim prize');
+    this.printMyData('Waiting to claim prize');
   }
 
-  private test() {
+  private ConnectToRoom() {
     this.ipfs = new IPFS({
       repo: repo(),
       EXPERIMENTAL: {
@@ -320,11 +264,67 @@ export class AppComponent {
 
     this.ipfs.once('ready', () => this.ipfs.id((err, info) => {
       if (err) { throw err; }
-      console.log('IPFS node ready with address ' + info.id);
+      this.printAppInfo(`IPFS node ready with address ${info.id}`);
     }));
 
     function repo() {
       return 'ipfs/pubsub-demo/' + Math.random();
     }
+
+    this.room = Room(this.ipfs, 'stateChannelDemo');
+  }
+
+  private async listenForEvents() {
+    this.room.on('peer joined', (peer) => {
+      this.printAppInfo(`${peer} joined`);
+      // this.stateText = `${peer} joined`;
+      this.changeDetection.detectChanges();
+    });
+    this.room.on('peer left', (peer) => {
+      // this.stateText = `${peer} left`;
+      this.printAppInfo(`${peer} left`);
+      this.changeDetection.detectChanges();
+    });
+    this.room.on('message', async (message) => {
+      const data = JSON.parse(message.data.toString());
+      if (data.type === 'commit') {
+        window.sessionStorage.setItem(data.type + data.nonce, message.data);
+        this.printMyData(`commit received: ${message.data}`);
+        const confirmHash = await this.signConfirmCommit(data.sig, data.nonce);
+        await this.sendHash(confirmHash);
+      } else if (data.type === 'confirmCommit') {
+        window.sessionStorage.setItem(data.type + data.nonce, message.data);
+        this.printMyData(`confirm commit received: ${message.data}`);
+      } else if (data.type === 'reveal') {
+        this.decryptOpponentMove(data);
+        this.defineWinner(data);
+        const stateHash = await this.signState();
+        await this.sendHash(stateHash);
+        this.printMyData(`reveal received: ${message.data}`);
+      } else if (data.type === 'state') {
+        this.printMyData(`state received: ${message.data}`);
+
+        const pl1 = ethers.utils.bigNumberify(data.playerOneScore);
+        const pl2 = ethers.utils.bigNumberify(data.playerTwoScore);
+
+        this.printMyData(`${data.playerOneAddress} => ${pl1.toString()}`);
+        this.printMyData(`${data.playerTwoAddress} => ${pl2.toString()}`);
+
+        window.sessionStorage.setItem(data.type + data.nonce, message.data);
+      } else if (data.type === 'player') {
+        this.playerTwo = data.address;
+        this.playerTwoScore = data.playerScore;
+        this.printMyData(`playerTwo: ${this.playerTwo}`);
+        this.printMyData(`playerTwoScore: ${this.playerTwoScore}`);
+      }
+    });
+  }
+
+  public printMyData(data) {
+    console.log(data);
+  }
+
+  public printAppInfo(data) {
+    console.log(data);
   }
 }
