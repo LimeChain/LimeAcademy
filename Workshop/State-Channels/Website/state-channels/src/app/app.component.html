@@ -31,8 +31,8 @@
   </div>
   <div class="row">
     <div class="col-12 text-center state-col">
-      <button class="btn btn-info" (click)="paper()">paper</button>
-      <button class="btn btn-info" (click)="revealLastMove()">Reveal Move</button>
+      <button class="btn btn-info paper" (click)="paper()">paper</button>
+      <button class="btn btn-info reveal-mode" (click)="revealLastMove()">Reveal Move</button>
     </div>
   </div>
   <div class="row">
@@ -63,7 +63,10 @@
   </div>
   <div class="row">
     <div class="col-12">
-      <p-messages [(value)]="msgs" closable="false"></p-messages>
+      <p-messages [(value)]="infoMessages" closable="false"></p-messages>
+    </div>
+    <div class="col-12">
+      <p-messages [(value)]="systemMessages" closable="false"></p-messages>
     </div>
   </div>
   <br>
