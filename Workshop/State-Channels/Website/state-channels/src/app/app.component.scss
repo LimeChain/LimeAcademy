@@ -10,4 +10,29 @@
 }
 .state-col {
 	margin: 5px;
+	.paper {
+		margin-left: 140px;
+	}
+	.reveal-mode {
+		margin-left: 20px;
+	}
+}
+
+.ui-messages {
+	.ui-messages-close	{
+		display: none;
+	}
+}
+
+.wallet-balance {
+	margin-top: 10px;
+	margin-bottom: 10px;
+	background-color: cyan;
+	background-color: rgba($color:cyan, $alpha: 0.3);
+	padding: 10px;
+	border-radius: 10px;
+	font-size: 20px;
+	p {
+		margin: auto;
+	}
 }
