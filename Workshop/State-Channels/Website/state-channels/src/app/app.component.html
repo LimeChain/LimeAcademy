@@ -4,20 +4,60 @@
       <h1>State Channels</h1>
     </div>
   </div>
+  <hr>
   <div class="row">
     <div class="col-12 text-center state-col">
-      <input type="text" [(ngModel)]="privateKey" placeholder="Your privateKey">
-      <button class="btn btn-info" (click)="functionButton1()">Button1</button>
+      <input type="password" [(ngModel)]="privateKey" placeholder="Your privateKey">
+      <button class="btn btn-info" (click)="unlockWallet()">Unlock Wallet</button>
+    </div>
+  </div>
+  <div class="row" id="walletBalance" *ngIf="balance">
+    <div class="col-12 text-center wallet-balance">
+      <p>{{ balance }}</p>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-12 text-center">
+      <input type="text" [(ngModel)]="contractAddress" placeholder="Contract Address">
+      <input type="text" [(ngModel)]="ethersDeposit" placeholder="Ethers Deposit">
+      <button class="btn btn-info" (click)="openChannel()">Open Channel</button>
+      <button class="btn btn-info" (click)="joinChannel()">Join Channel</button>
+    </div>
+  </div>
+  <hr>
+  <div class="row">
+    <div class="col-12 text-center state-col">
+      <button class="btn btn-info" (click)="rock()">rock</button>
     </div>
   </div>
   <div class="row">
     <div class="col-12 text-center state-col">
-      <button class="btn btn-info" (click)="functionButton2()">Button1</button>
+      <button class="btn btn-info paper" (click)="paper()">paper</button>
+      <button class="btn btn-info reveal-mode" (click)="revealLastMove()">Reveal Move</button>
     </div>
   </div>
   <div class="row">
     <div class="col-12 text-center state-col">
-      <button class="btn btn-info" (click)="functionButton3()">Button1</button>
+      <button class="btn btn-info" (click)="scissors()">scissors</button>
+    </div>
+  </div>
+  <hr>
+  <div class="row">
+    <div class="col-12 text-center state-col">
+      <button class="btn btn-info" (click)="closeChannel()">Close Channel</button>
+      <button class="btn btn-info" (click)="claimPrize()">Claim Prize</button>
+    </div>
+  </div>
+  <hr>
+  <div class="row">
+    <div class="col-12">
+      <p-messages [(value)]="userAction" closable="false"></p-messages>
+    </div>
+    <div class="col-12">
+      <p-messages [(value)]="infoMessages" closable="false"></p-messages>
+    </div>
+    <div class="col-12">
+      <p-messages [(value)]="systemMessages" closable="false"></p-messages>
     </div>
   </div>
   <br>
