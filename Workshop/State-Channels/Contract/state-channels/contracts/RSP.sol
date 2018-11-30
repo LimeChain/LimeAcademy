@@ -106,12 +106,11 @@ contract RSP {
     }
 
     // TODO: closeChannelDispute within next Game
-    function payPrizes() public view onlyPlayer onlyAfterDisputePeriod {
+    function payPrizes() public onlyPlayer onlyAfterDisputePeriod {
         require(addressToPrize[msg.sender] > 0);
         uint256 priseForPlayer = addressToPrize[msg.sender];
         addressToPrize[msg.sender] = 0;
         msg.sender.transfer(priseForPlayer);
-//        return priseForPlayer;
     }
 
     function recover(bytes32 _hash, bytes _signedDataByPlayer) internal pure returns (address) {
