@@ -241,7 +241,7 @@ export class AppComponent {
     const rspInstance = new ethers.Contract(this.contractAddress, RSP.abi, this.networkProvider);
     const rspInstanceWithWallet = await rspInstance.connect(this.wallet);
 
-    await rspInstanceWithWallet.payPrizes();
+    await rspInstanceWithWallet.payPrizes({gasLimit: 4000000});
     this.printMyData('Waiting to claim prize');
   }
 

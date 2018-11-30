@@ -23,8 +23,8 @@ describe('Example', () => {
         playerOne.wallet = playerOne.wallet.connect(deployer.provider);
         playerTwo.wallet = playerTwo.wallet.connect(deployer.provider);
 
-        plOneContract = await deployedContractWrapper.contract.connect(playerOne.wallet, {gasLimit: 8000000});
-        plTwoContract = await deployedContractWrapper.contract.connect(playerTwo.wallet, {gasLimit: 8000000});
+        plOneContract = await deployedContractWrapper.contract.connect(playerOne.wallet);
+        plTwoContract = await deployedContractWrapper.contract.connect(playerTwo.wallet);
         await plOneContract.openChannel({value: 5});
         await plTwoContract.joinChannel({value: 5});
     });
@@ -248,7 +248,7 @@ describe('Example', () => {
 
         await utils.timeTravel(deployer.provider, 100);
 
-        await plOneContract.payPrizes();
+        await plOneContract.payPrizes({gasLimit: 4000000});
 
         temp = await provider.getBalance(playerOne.wallet.address);
         console.log(temp.toString());
