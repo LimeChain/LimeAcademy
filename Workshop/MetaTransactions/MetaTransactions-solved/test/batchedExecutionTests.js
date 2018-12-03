@@ -85,4 +85,64 @@ describe('Example', () => {
         assert(billboardAllowance.eq(0), 'The Billboard has an allowance, but it should not');
 
     })
+
+    describe('Relayer', () => {
+        before(async () => {
+            // Approve
+            approveData = MetaTokenContract.contract.interface.functions.approve
+                .encode([BillboardContract.contractAddress, 200]);
+
+            const approveHash = utils.solidityKeccak256(
+                ['address', 'uint256', 'bytes'],
+                [MetaTokenContract.contractAddress, 0, approveData]
+            );
+
+            approveSignature = await wallet.signMessage(utils.arrayify(approveHash));
+
+            // Buy
+            buySloganData = BillboardContract.contract.interface.functions.buy
+                .encode(["Majstor e Ogi", 200]);
+
+            const buyHash = utils.solidityKeccak256(
+                ['address', 'uint256', 'bytes'],
+                [BillboardContract.contractAddress, 0, buySloganData]);
+
+            buySloganDataSignature = await wallet.signMessage(utils.arrayify(buyHash));
+        });
+
+        it('Should succeed through relayer', async () => {
+
+            const relayerWallet = accounts[3].wallet.connect(deployer.provider);
+            const RelayerMetaBatchContract = MetaBatchContract.contract.connect(relayerWallet);
+
+            await RelayerMetaBatchContract.execute(
+                [MetaTokenContract.contractAddress, BillboardContract.contractAddress],
+                [0, 0],
+                [approveData, buySloganData],
+                [approveSignature, buySloganDataSignature],
+                {
+                    gasLimit: 4700000
+                }
+            )
+
+            const proxyBalance = await MetaTokenContract.contract
+                .balanceOf(MetaBatchContract.contractAddress);
+
+            assert(proxyBalance.eq(9700),
+                'The balance of the proxy was not correctly lowered');
+
+            const billboardBalance = await MetaTokenContract.contract
+                .balanceOf(BillboardContract.contractAddress);
+
+            assert(billboardBalance.eq(300),
+                'The balance of the billboard is not correct');
+
+            const billboardAllowance = await MetaTokenContract.contract
+                .allowance(MetaBatchContract.contractAddress, BillboardContract.contractAddress);
+
+            assert(billboardAllowance.eq(0),
+                'Incorrect allowance to the Billboard contract');
+
+        })
+    })
 });
