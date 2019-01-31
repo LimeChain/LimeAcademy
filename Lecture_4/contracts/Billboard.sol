@@ -1,6 +1,6 @@
-pragma solidity ^0.4.23;
+pragma solidity ^0.5.0;
 
-import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
+import "./Ownable.sol";
 
 
 contract Billboard is Ownable {
@@ -31,7 +31,7 @@ contract Billboard is Ownable {
      * functions
      */
 
-    function buy(string newSlogan) public payable {
+    function buy(string memory newSlogan) public payable {
         require(msg.value >= price, "The ether sent was too low");
 
         billboardOwner = msg.sender;
@@ -52,10 +52,9 @@ contract Billboard is Ownable {
 
     function withdraw() public onlyOwner {
         uint256 balance = address(this).balance;
-
         require(balance > 0, "Contract balance is 0");
-
-        owner.transfer(address(this).balance);
+        
+        owner().transfer(balance);
 
         emit LogWithdrawal(balance, now);
     }
